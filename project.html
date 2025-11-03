@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Proyecto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.98);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffffff 0%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #d4af37, #f4d03f);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #d4af37;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .nav-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #d4af37;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+
+        .nav-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .nav-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .nav-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px 20px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 968px) {
+            .nav-menu {
+                position: fixed;
+                top: -300%;
+                left: 0;
+                flex-direction: column;
+                background: rgba(10, 10, 10, 0.98);
+                width: 100%;
+                padding: 30px 20px;
+                gap: 25px;
+                transition: top 0.4s ease;
+                border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+                backdrop-filter: blur(15px);
+                z-index: 999;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            }
+
+            .nav-menu.active {
+                top: 70px;
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
+
+            .nav-link {
+                font-size: 1.1em;
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav-link::after {
+                display: none;
+            }
+
+            .nav-link:hover {
+                color: #d4af37;
+                transform: translateX(10px);
+            }
+        }
+
+        .particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #d4af37;
+            border-radius: 50%;
+            animation: float 15s infinite;
+            opacity: 0.2;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0);
+            }
+
+            50% {
+                transform: translateY(-100px) translateX(50px);
+            }
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            color: #d4af37;
+            text-decoration: none;
+            transition: all 0.4s ease;
+            font-size: 1em;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .back-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .back-button:hover::before {
+            left: 100%;
+        }
+
+        .back-button:hover {
+            background: rgba(212, 175, 55, 0.2);
+            transform: translateX(-8px);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .project-header {
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            animation: slideDown 0.6s ease 0.2s both;
+        }
+
+        .project-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+        }
+
+        .project-title {
+            font-size: 3em;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffffff 0%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeIn 0.8s ease 0.4s both;
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 25px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            transition: all 0.3s ease;
+            animation: scaleIn 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .meta-item:nth-child(1) {
+            animation-delay: 0.5s;
+        }
+
+        .meta-item:nth-child(2) {
+            animation-delay: 0.6s;
+        }
+
+        .meta-item:nth-child(3) {
+            animation-delay: 0.7s;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .meta-item:hover {
+            background: rgba(212, 175, 55, 0.2);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+        }
+
+        .meta-label {
+            font-size: 0.9em;
+            color: #b0b0b0;
+            margin-bottom: 8px;
+        }
+
+        .meta-value {
+            font-size: 1.2em;
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        .gallery-section {
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease 0.6s both;
+            position: relative;
+            z-index: 1;
+        }
+
+        .gallery-main {
+            width: 100%;
+            height: 500px;
+            background: #0a0a0a;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            border: 1px solid #2d2d2d;
+        }
+
+        .gallery-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(10, 10, 10, 0.3) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .gallery-main img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease, opacity 0.3s ease;
+        }
+
+        .gallery-main:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-thumbnails {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .thumbnail {
+            height: 100px;
+            background: #0a0a0a;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .thumbnail::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(212, 175, 55, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+        }
+
+        .thumbnail:hover::before {
+            opacity: 1;
+        }
+
+        .thumbnail:hover {
+            border-color: #d4af37;
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .thumbnail.active {
+            border-color: #d4af37;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+            transform: scale(1.05);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .thumbnail:hover img {
+            transform: scale(1.1);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #1f1f1f 100%);
+            border-radius: 20px;
+            padding: 35px;
+            border: 1px solid #2d2d2d;
+            transition: all 0.4s ease;
+            animation: fadeIn 0.8s ease 0.8s both;
+        }
+
+        .content-card:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-size: 1.9em;
+            margin-bottom: 25px;
+            color: #ffffff;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .card-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #d4af37, transparent);
+        }
+
+        .description {
+            line-height: 1.9;
+            color: #c0c0c0;
+            margin-bottom: 25px;
+            font-size: 1.05em;
+        }
+
+        .tags {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .tag {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.15));
+            color: #d4af37;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 500;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background: rgba(212, 175, 55, 0.3);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .links-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .link-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 25px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            text-decoration: none;
+            color: #e0e0e0;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .link-button:hover::before {
+            left: 100%;
+        }
+
+        .link-button:hover {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.15));
+            border-color: #d4af37;
+            transform: translateX(10px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .link-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .link-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: #0a0a0a;
+            transition: transform 0.3s ease;
+        }
+
+        .link-button:hover .link-icon {
+            transform: scale(1.15) rotate(360deg);
+        }
+
+        .link-info h3 {
+            color: #d4af37;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .link-info p {
+            color: #b0b0b0;
+            font-size: 0.9em;
+        }
+
+        .link-arrow {
+            font-size: 1.5em;
+            color: #d4af37;
+            transition: transform 0.3s ease;
+        }
+
+        .link-button:hover .link-arrow {
+            transform: translateX(5px);
+        }
+
+        @media (max-width: 968px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .project-title {
+                font-size: 2em;
+            }
+
+            .gallery-main {
+                height: 300px;
+            }
+
+            .meta-item {
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="particles" id="particles"></div>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a class="nav-logo" href="index.html">Dumar</a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#info" class="nav-link" onclick="scrollToTop()">Info</a></li>
+                <li><a href="#images" class="nav-link">Imágenes</a></li>
+                <li><a href="#description" class="nav-link">Descripción</a></li>
+            </ul>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Volver al Portafolio
+        </a>
+
+        <section id="info">
+            <div class="project-header">
+                <h1 class="project-title" id="projectTitle">Cargando...</h1>
+                <div class="project-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Rol</span>
+                        <span class="meta-value" id="projectRole">-</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Duración</span>
+                        <span class="meta-value" id="projectDuration">-</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Estado</span>
+                        <span class="meta-value">✓ Completado</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="images" class="gallery-section">
+            <div class="gallery-main" id="galleryMain">
+                <img id="mainImage" src="" alt="Imagen principal">
+            </div>
+            <div class="gallery-thumbnails" id="galleryThumbnails"></div>
+        </section>
+
+        <div class="content-grid">
+            <section id="description" class="content-card">
+                <h2 class="card-title">Descripción del Proyecto</h2>
+                <div class="description" id="projectDescription"></div>
+                <div class="tags" id="projectTags"></div>
+            </section>
+
+            <section id="links" class="content-card">
+                <h2 class="card-title">Enlaces</h2>
+                <div class="links-section" id="linksSection"></div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        document.getElementById('navToggle').addEventListener('click', () => {
+            const navMenu = document.getElementById('navMenu');
+            const navToggle = document.getElementById('navToggle');
+
+            navMenu.classList.toggle('active');
+            navToggle.classList.toggle('active');
+
+            document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navMenu').classList.remove('active');
+                document.getElementById('navToggle').classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            const navMenu = document.getElementById('navMenu');
+            const navToggle = document.getElementById('navToggle');
+
+            if (!navMenu.contains(e.target) && !navToggle.contains(e.target) && navMenu.classList.contains('active')) {
+                navMenu.classList.remove('active');
+                navToggle.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = parseInt(urlParams.get('id'));
+        const projects = JSON.parse(localStorage.getItem('portfolioProjects') || '[]');
+        const project = projects.find(p => p.id === projectId);
+
+        if (!project) {
+            document.body.innerHTML = '<div style="text-align: center; padding: 100px; color: #b0b0b0;">Proyecto no encontrado</div>';
+        } else {
+            loadProject(project);
+        }
+
+        function loadProject(project) {
+            document.getElementById('projectTitle').textContent = project.title;
+            document.getElementById('projectRole').textContent = project.role;
+            document.getElementById('projectDuration').textContent = project.duration;
+            document.getElementById('projectDescription').textContent = project.description;
+
+            const tagsContainer = document.getElementById('projectTags');
+            project.tags.forEach((tag, index) => {
+                const tagEl = document.createElement('span');
+                tagEl.className = 'tag';
+                tagEl.textContent = tag;
+                tagEl.style.animationDelay = (0.9 + index * 0.1) + 's';
+                tagsContainer.appendChild(tagEl);
+            });
+
+            loadGallery(project.images);
+
+            loadLinks(project);
+        }
+
+        function loadGallery(images) {
+            const mainImg = document.getElementById('mainImage');
+            const thumbnailsContainer = document.getElementById('galleryThumbnails');
+
+            if (images.length > 0) {
+                mainImg.src = images[0];
+            }
+
+            images.forEach((img, index) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'thumbnail' + (index === 0 ? ' active' : '');
+                thumb.innerHTML = `<img src="${img}" alt="Imagen ${index + 1}">`;
+                thumb.onclick = () => {
+                    mainImg.style.opacity = '0';
+                    setTimeout(() => {
+                        mainImg.src = img;
+                        mainImg.style.opacity = '1';
+                    }, 200);
+                    document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                    thumb.classList.add('active');
+                };
+                thumbnailsContainer.appendChild(thumb);
+            });
+        }
+
+        function loadLinks(project) {
+            const container = document.getElementById('linksSection');
+            let html = '';
+
+            if (project.gameId) {
+                html += `
+                    <a href="https://www.roblox.com/games/${project.gameId}" target="_blank" class="link-button">
+                        <div class="link-content">
+                            <div class="link-icon">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <div class="link-info">
+                                <h3>Ver Juego</h3>
+                                <p>Jugar en Roblox</p>
+                            </div>
+                        </div>
+                        <div class="link-arrow">→</div>
+                    </a>
+                `;
+            }
+
+            if (project.groupId) {
+                html += `
+                    <a href="https://www.roblox.com@/groups/${project.groupId}" target="_blank" class="link-button">
+                        <div class="link-content">
+                            <div class="link-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="link-info">
+                                <h3>Ver Grupo</h3>
+                                <p>Visitar grupo en Roblox</p>
+                            </div>
+                        </div>
+                        <div class="link-arrow">→</div>
+                    </a>
+                `;
+            }
+
+            if (!html) {
+                html = '<p style="color: #b0b0b0; text-align: center; padding: 20px;">No hay enlaces disponibles</p>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        createParticles();
+    </script>
+</body>
+
+</html>
