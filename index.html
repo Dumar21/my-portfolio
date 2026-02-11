@@ -1506,6 +1506,9 @@
             },
         ];
 
+        localStorage.setItem('portfolioProjects', JSON.stringify(projects));
+        localStorage.setItem('portfolioSystems', JSON.stringify(systems));
+
         function createParticles() {
             const container = document.getElementById('particles');
             for (let i = 0; i < 30; i++) {
@@ -1899,3 +1902,4 @@
 
 
 </html>
+
