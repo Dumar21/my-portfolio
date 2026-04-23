@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Ticket – Dumar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+
+        :root {
+            --gold: #d4af37; --gold-light: #f4d03f;
+            --gold-dim: rgba(212,175,55,.15); --gold-border: rgba(212,175,55,.3);
+            --bg:#0a0a0a; --bg2:#141414; --bg3:#1a1a1a;
+            --text:#e0e0e0; --muted:#777;
+            --green:#4bb543; --red:#e74c3c; --yellow:#f39c12; --blue:#3498db;
+        }
+
+        body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+        .navbar {
+            position:fixed; top:0; left:0; right:0;
+            background:rgba(20,20,20,.96); backdrop-filter:blur(12px);
+            padding:18px 0; z-index:1000; border-bottom:1px solid var(--gold-border);
+        }
+        .nav-container { max-width:1100px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; align-items:center; }
+        .nav-logo { font-size:1.4em; font-weight:800; background:linear-gradient(135deg,#fff 0%,var(--gold) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-decoration:none; }
+        .nav-links { display:flex; gap:32px; list-style:none; }
+        .nav-links a { color:var(--text); text-decoration:none; font-weight:500; transition:color .2s; font-size:.95em; }
+        .nav-links a:hover { color:var(--gold); }
+
+        /* ── HERO ── */
+        .hero { padding:130px 24px 60px; text-align:center; background:radial-gradient(ellipse 70% 40% at 50% 0%,rgba(212,175,55,.07) 0%,transparent 70%); }
+        .hero h1 { font-size:clamp(2em,5vw,3.2em); font-weight:800; background:linear-gradient(135deg,#fff 30%,var(--gold) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:12px; }
+        .hero p { color:var(--muted); max-width:500px; margin:0 auto 40px; line-height:1.7; }
+
+        /* ── SEARCH ── */
+        .search-wrap { max-width:500px; margin:0 auto; display:flex; gap:12px; }
+        .search-wrap input {
+            flex:1; background:var(--bg3); border:1px solid #2a2a2a; border-radius:12px;
+            padding:16px 20px; color:var(--text); font-size:1.05em; font-family:inherit;
+            outline:none; transition:border-color .2s; letter-spacing:.05em; text-transform:uppercase;
+        }
+        .search-wrap input::placeholder { text-transform:none; letter-spacing:0; color:var(--muted); }
+        .search-wrap input:focus { border-color:var(--gold-border); }
+        .search-btn {
+            padding:0 28px; background:linear-gradient(135deg,var(--gold),var(--gold-light));
+            border:none; border-radius:12px; color:#0a0a0a; font-weight:800;
+            cursor:pointer; font-size:1em; transition:all .2s;
+        }
+        .search-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(212,175,55,.4); }
+
+        /* ── MAIN ── */
+        .main { max-width:700px; margin:0 auto; padding:40px 24px 80px; }
+
+        /* ── RESULT CARD ── */
+        .result-card {
+            background:var(--bg3); border:1px solid #2a2a2a;
+            border-radius:20px; overflow:hidden; display:none;
+            animation:fadeUp .4s ease both;
+        }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        .result-header {
+            padding:28px 32px;
+            border-bottom:1px solid #222;
+            display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;
+        }
+        .result-header h2 { font-size:1.5em; color:#fff; }
+        .result-header .ticket-id { font-size:.85em; color:var(--muted); margin-top:4px; font-family:monospace; letter-spacing:.06em; }
+
+        .status-pill {
+            padding:8px 18px; border-radius:50px; font-size:.85em; font-weight:700;
+            border:1px solid; white-space:nowrap;
+        }
+        .pill-pending   { border-color:var(--muted); color:var(--muted); background:rgba(136,136,136,.08); }
+        .pill-reviewing { border-color:var(--blue);  color:var(--blue);  background:rgba(52,152,219,.1); }
+        .pill-accepted  { border-color:var(--green); color:var(--green); background:rgba(75,181,67,.1); }
+        .pill-rejected  { border-color:var(--red);   color:var(--red);   background:rgba(231,76,60,.1); }
+        .pill-working   { border-color:var(--yellow);color:var(--yellow);background:rgba(243,156,18,.1); }
+        .pill-delivered { border-color:#9b59b6;      color:#9b59b6;      background:rgba(155,89,182,.1); }
+
+        /* ── TIMELINE ── */
+        .timeline { padding:32px; }
+        .tl-step {
+            display:flex; gap:18px; position:relative; padding-bottom:32px;
+        }
+        .tl-step:last-child { padding-bottom:0; }
+        .tl-step:not(:last-child)::before {
+            content:''; position:absolute;
+            left:19px; top:40px; bottom:0; width:2px;
+            background:linear-gradient(to bottom,var(--tl-color,#333),#222);
+        }
+        .tl-icon {
+            width:40px; height:40px; border-radius:50%; flex-shrink:0;
+            display:flex; align-items:center; justify-content:center;
+            font-size:.95em; border:2px solid;
+            transition:all .3s;
+        }
+        .tl-step.done   .tl-icon { background:rgba(75,181,67,.15); border-color:var(--green); color:var(--green); }
+        .tl-step.active .tl-icon { background:rgba(212,175,55,.15); border-color:var(--gold); color:var(--gold); animation:glow .8s ease-in-out infinite alternate; }
+        .tl-step.future .tl-icon { background:#1a1a1a; border-color:#333; color:#444; }
+        @keyframes glow { to { box-shadow:0 0 12px rgba(212,175,55,.4); } }
+
+        .tl-content { padding-top:6px; }
+        .tl-content h4 { font-size:1em; font-weight:700; color:#fff; margin-bottom:4px; }
+        .tl-step.future .tl-content h4 { color:#444; }
+        .tl-content p { font-size:.88em; color:var(--muted); line-height:1.5; }
+
+        /* ── DETAILS ── */
+        .details-grid {
+            padding:0 32px 32px;
+            display:grid; grid-template-columns:1fr 1fr; gap:14px;
+        }
+        .detail-item { background:var(--bg2); border-radius:10px; padding:14px 16px; }
+        .detail-label { font-size:.75em; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; }
+        .detail-value { font-size:.95em; color:#ddd; font-weight:600; }
+
+        /* ── ADMIN NOTE ── */
+        .admin-note {
+            margin:0 32px 32px; padding:16px 20px;
+            background:rgba(212,175,55,.06); border:1px solid var(--gold-border);
+            border-radius:12px; display:none;
+        }
+        .admin-note .note-label { font-size:.75em; color:var(--gold); font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px; }
+        .admin-note .note-text { font-size:.9em; color:var(--text); line-height:1.6; }
+
+        /* ── NOT FOUND ── */
+        .not-found {
+            text-align:center; padding:60px 24px; display:none;
+            animation:fadeUp .4s ease both;
+        }
+        .not-found .nf-icon { font-size:3em; margin-bottom:16px; }
+        .not-found h3 { color:#fff; font-size:1.4em; margin-bottom:8px; }
+        .not-found p { color:var(--muted); line-height:1.6; }
+
+        /* ── LOADING ── */
+        .loading-state { text-align:center; padding:60px; display:none; }
+        .loading-state .spin { width:36px; height:36px; border:3px solid #222; border-top-color:var(--gold); border-radius:50%; animation:spin .7s linear infinite; margin:0 auto 16px; }
+        @keyframes spin { to{transform:rotate(360deg)} }
+
+        @media(max-width:600px) {
+            .search-wrap { flex-direction:column; }
+            .search-btn { padding:16px; }
+            .details-grid { grid-template-columns:1fr; }
+            .result-header { flex-direction:column; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <a class="nav-logo" href="index.html">Dumar</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Portfolio</a></li>
+            <li><a href="commissions.html">Commissions</a></li>
+            <li><a href="ticket.html" style="color:var(--gold)">Track Ticket</a></li>
+        </ul>
+    </div>
+</nav>
+
+<section class="hero">
+    <h1>Track your ticket</h1>
+    <p>Enter your ticket number to see the current status of your commission request.</p>
+    <div class="search-wrap">
+        <input type="text" id="ticketInput" placeholder="e.g. DM-A3B7KC" maxlength="12" onkeydown="if(event.key==='Enter')searchTicket()">
+        <button class="search-btn" onclick="searchTicket()"><i class="fas fa-search"></i></button>
+    </div>
+</section>
+
+<div class="main">
+
+    <div class="loading-state" id="loadingState">
+        <div class="spin"></div>
+        <p style="color:var(--muted)">Looking up your ticket…</p>
+    </div>
+
+    <div class="not-found" id="notFound">
+        <div class="nf-icon">🔍</div>
+        <h3>Ticket not found</h3>
+        <p>Double-check the number and try again.<br>Tickets look like: <strong style="color:var(--gold)">DM-A3B7KC</strong></p>
+    </div>
+
+    <div class="result-card" id="resultCard">
+
+        <div class="result-header">
+            <div>
+                <h2 id="rcName">Commission by —</h2>
+                <div class="ticket-id" id="rcTicket">—</div>
+            </div>
+            <div class="status-pill" id="rcPill">—</div>
+        </div>
+
+        <!-- Admin note (if any) -->
+        <div class="admin-note" id="adminNote">
+            <div class="note-label"><i class="fas fa-comment-alt"></i> Message from Dumar</div>
+            <div class="note-text" id="adminNoteText"></div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline" id="timeline"></div>
+
+        <!-- Details -->
+        <div class="details-grid" id="detailsGrid"></div>
+
+    </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── Status config ──
+const STATUS_CONFIG = {
+    pending:   { label:'Received',    icon:'fa-inbox',         pill:'pill-pending',   step:0 },
+    reviewing: { label:'Under Review',icon:'fa-search',        pill:'pill-reviewing', step:1 },
+    accepted:  { label:'Accepted',    icon:'fa-check-circle',  pill:'pill-accepted',  step:2 },
+    rejected:  { label:'Rejected',    icon:'fa-times-circle',  pill:'pill-rejected',  step:2 },
+    working:   { label:'In Progress', icon:'fa-code',          pill:'pill-working',   step:3 },
+    delivered: { label:'Delivered',   icon:'fa-gift',          pill:'pill-delivered', step:4 }
+};
+
+const STEPS = [
+    { icon:'fa-inbox',    label:'Request Received',    desc:'Your commission request has been received.' },
+    { icon:'fa-search',   label:'Under Review',        desc:'Reviewing the details of your request.' },
+    { icon:'fa-handshake',label:'Accepted / Evaluated',desc:'Decision made — accepted or adjusted.' },
+    { icon:'fa-code',     label:'In Progress',         desc:'Actively working on your commission.' },
+    { icon:'fa-gift',     label:'Delivered',           desc:'Work delivered and completed!' },
+];
+
+const WORK_LABELS = {
+    new_game:'New game', system:'Script / System', ui:'UI Design',
+    bug_fix:'Bug fixing', collab:'Collab / Rev. share', other:'Other'
+};
+const PAYMENT_LABELS = { usd:'💵 USD', robux:'🎮 Robux', percent:'📊 % Revenue', discuss:'🤝 Discuss' };
+const URGENCY_LABELS = { no_rush:'😌 No rush', normal:'⏱ Normal', urgent:'🔥 Urgent' };
+
+async function searchTicket() {
+    const raw = document.getElementById('ticketInput').value.trim().toUpperCase();
+    if (!raw) return;
+
+    hide('resultCard'); hide('notFound');
+    show('loadingState');
+
+    try {
+        const { data, error } = await sb
+            .from('commissions')
+            .select('*')
+            .eq('ticket_id', raw)
+            .single();
+
+        hide('loadingState');
+
+        if (error || !data) { show('notFound'); return; }
+
+        renderResult(data);
+        show('resultCard');
+
+    } catch(e) {
+        hide('loadingState');
+        show('notFound');
+    }
+}
+
+function renderResult(d) {
+    const cfg = STATUS_CONFIG[d.status] || STATUS_CONFIG.pending;
+
+    // Header
+    document.getElementById('rcName').textContent = `Commission by ${d.client_name}`;
+    document.getElementById('rcTicket').textContent = d.ticket_id;
+    const pill = document.getElementById('rcPill');
+    pill.textContent = cfg.label;
+    pill.className = 'status-pill ' + cfg.pill;
+
+    // Admin note
+    const noteBox = document.getElementById('adminNote');
+    if (d.admin_note) {
+        document.getElementById('adminNoteText').textContent = d.admin_note;
+        noteBox.style.display = 'block';
+    } else {
+        noteBox.style.display = 'none';
+    }
+
+    // Timeline
+    const tl = document.getElementById('timeline');
+    tl.innerHTML = '';
+    const currentStep = d.status === 'rejected' ? 2 : cfg.step;
+    const isRejected  = d.status === 'rejected';
+
+    STEPS.forEach((step, i) => {
+        let state = 'future';
+        if (i < currentStep) state = 'done';
+        if (i === currentStep) state = 'active';
+
+        const div = document.createElement('div');
+        div.className = 'tl-step ' + state;
+        div.style.setProperty('--tl-color', state === 'done' ? 'var(--green)' : state === 'active' ? 'var(--gold)' : '#333');
+
+        let iconOverride = step.icon;
+        let labelOverride = step.label;
+        let descOverride = step.desc;
+
+        if (i === 2 && isRejected && state === 'active') {
+            iconOverride = 'fa-times-circle';
+            labelOverride = 'Rejected';
+            descOverride = 'This commission was not accepted. Feel free to submit a new request with adjusted details.';
+        }
+
+        div.innerHTML = `
+            <div class="tl-icon"><i class="fas ${iconOverride}"></i></div>
+            <div class="tl-content">
+                <h4>${labelOverride}</h4>
+                <p>${state !== 'future' ? descOverride : 'Pending'}</p>
+            </div>`;
+        tl.appendChild(div);
+    });
+
+    // Details
+    const dg = document.getElementById('detailsGrid');
+    const date = new Date(d.created_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+    const details = [
+        { label:'Work type',    value: WORK_LABELS[d.work_type] || d.work_type },
+        { label:'Budget',       value: d.budget },
+        { label:'Payment',      value: PAYMENT_LABELS[d.payment_method] || d.payment_method },
+        { label:'Urgency',      value: URGENCY_LABELS[d.urgency] || d.urgency },
+        { label:'Submitted',    value: date },
+        { label:'Roblox user',  value: d.roblox_user },
+    ];
+    dg.innerHTML = details.map(x => `
+        <div class="detail-item">
+            <div class="detail-label">${x.label}</div>
+            <div class="detail-value">${x.value || '—'}</div>
+        </div>`).join('');
+}
+
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+// Pre-fill from URL param (?ticket=DM-XXXXX)
+const params = new URLSearchParams(location.search);
+if (params.get('ticket')) {
+    document.getElementById('ticketInput').value = params.get('ticket');
+    searchTicket();
+}
+</script>
+</body>
+</html>

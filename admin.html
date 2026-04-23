@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel – Dumar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --gold:#d4af37; --gold-light:#f4d03f;
+            --gold-dim:rgba(212,175,55,.15); --gold-border:rgba(212,175,55,.3);
+            --bg:#0a0a0a; --bg2:#111; --bg3:#181818; --bg4:#1e1e1e;
+            --text:#e0e0e0; --muted:#666;
+            --green:#4bb543; --red:#e74c3c; --yellow:#f39c12; --blue:#3498db; --purple:#9b59b6;
+        }
+        body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+        /* ── LOGIN SCREEN ── */
+        .login-screen {
+            min-height:100vh; display:flex; align-items:center; justify-content:center;
+            background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(212,175,55,.06) 0%,transparent 70%);
+        }
+        .login-box {
+            background:var(--bg3); border:1px solid #222; border-radius:20px;
+            padding:48px 40px; width:100%; max-width:420px; text-align:center;
+        }
+        .login-box .logo { font-size:2.5em; margin-bottom:8px; }
+        .login-box h2 { font-size:1.5em; color:#fff; margin-bottom:6px; }
+        .login-box p { color:var(--muted); font-size:.9em; margin-bottom:32px; }
+        .login-box input {
+            width:100%; background:var(--bg2); border:1px solid #282828; border-radius:10px;
+            padding:14px 16px; color:var(--text); font-size:1em; font-family:inherit;
+            outline:none; margin-bottom:14px; transition:border-color .2s;
+        }
+        .login-box input:focus { border-color:var(--gold-border); }
+        .login-btn {
+            width:100%; padding:14px;
+            background:linear-gradient(135deg,var(--gold),var(--gold-light));
+            border:none; border-radius:10px; color:#0a0a0a; font-weight:800;
+            font-size:1em; cursor:pointer; transition:all .2s;
+        }
+        .login-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(212,175,55,.4); }
+        .login-err { color:var(--red); font-size:.85em; margin-top:10px; display:none; }
+
+        /* ── APP SHELL ── */
+        .app { display:none; }
+        .topbar {
+            position:sticky; top:0; z-index:100;
+            background:rgba(14,14,14,.96); backdrop-filter:blur(12px);
+            border-bottom:1px solid #1e1e1e; padding:16px 28px;
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .topbar .brand { font-size:1.2em; font-weight:800; color:var(--gold); }
+        .topbar .right { display:flex; align-items:center; gap:16px; }
+        .logout-btn {
+            padding:8px 16px; background:transparent; border:1px solid #333;
+            border-radius:8px; color:var(--muted); cursor:pointer; font-size:.85em;
+            transition:all .2s;
+        }
+        .logout-btn:hover { border-color:var(--red); color:var(--red); }
+
+        /* ── LAYOUT ── */
+        .layout { display:grid; grid-template-columns:260px 1fr; min-height:calc(100vh - 60px); }
+
+        /* ── SIDEBAR ── */
+        .sidebar { background:var(--bg2); border-right:1px solid #1a1a1a; padding:24px 0; }
+        .sidebar-section { padding:0 16px; margin-bottom:28px; }
+        .sidebar-label { font-size:.65em; letter-spacing:.15em; color:var(--muted); text-transform:uppercase; padding:0 8px; margin-bottom:10px; }
+        .sidebar-btn {
+            width:100%; text-align:left; padding:11px 14px; border-radius:10px;
+            background:transparent; border:none; color:var(--muted); cursor:pointer;
+            font-size:.9em; font-family:inherit; display:flex; align-items:center; gap:10px;
+            transition:all .2s; margin-bottom:4px;
+        }
+        .sidebar-btn:hover { background:var(--bg3); color:var(--text); }
+        .sidebar-btn.active { background:var(--gold-dim); color:var(--gold); }
+        .sidebar-btn .badge {
+            margin-left:auto; background:var(--red); color:#fff;
+            font-size:.7em; font-weight:800; padding:2px 7px; border-radius:50px;
+        }
+
+        /* ── STATUS CONTROL ── */
+        .status-control { margin:0 16px 20px; padding:16px; background:var(--bg3); border-radius:14px; border:1px solid #222; }
+        .sc-label { font-size:.75em; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:12px; font-weight:700; }
+        .sc-btns { display:flex; flex-direction:column; gap:8px; }
+        .sc-btn {
+            padding:10px 14px; border-radius:9px; cursor:pointer; border:1px solid #2a2a2a;
+            background:var(--bg2); color:var(--muted); font-size:.85em; font-weight:600;
+            text-align:center; transition:all .2s; font-family:inherit;
+        }
+        .sc-btn:hover { border-color:var(--gold-border); color:var(--gold); }
+        .sc-btn.sc-active-open   { border-color:var(--green); background:rgba(75,181,67,.1); color:var(--green); }
+        .sc-btn.sc-active-busy   { border-color:var(--yellow); background:rgba(243,156,18,.1); color:var(--yellow); }
+        .sc-btn.sc-active-closed { border-color:var(--red); background:rgba(231,76,60,.1); color:var(--red); }
+        .slots-input { margin-top:10px; width:100%; background:var(--bg2); border:1px solid #2a2a2a; border-radius:8px; padding:9px 12px; color:var(--text); font-size:.85em; font-family:inherit; outline:none; }
+        .slots-input:focus { border-color:var(--gold-border); }
+        .save-sc-btn { margin-top:10px; width:100%; padding:9px; background:var(--gold-dim); border:1px solid var(--gold-border); border-radius:8px; color:var(--gold); font-weight:700; cursor:pointer; font-size:.85em; transition:all .2s; }
+        .save-sc-btn:hover { background:rgba(212,175,55,.25); }
+
+        /* ── CONTENT ── */
+        .content { padding:28px; overflow-x:auto; }
+
+        /* ── STATS ── */
+        .stats-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:16px; margin-bottom:28px; }
+        .stat-card { background:var(--bg3); border:1px solid #222; border-radius:14px; padding:20px; }
+        .stat-card .sc-num { font-size:2em; font-weight:900; color:var(--gold); }
+        .stat-card .sc-lbl { font-size:.8em; color:var(--muted); margin-top:4px; }
+
+        /* ── FILTERS ── */
+        .filters { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+        .filter-btn {
+            padding:8px 16px; border-radius:8px; border:1px solid #2a2a2a;
+            background:var(--bg3); color:var(--muted); cursor:pointer; font-size:.83em;
+            font-weight:600; transition:all .2s; font-family:inherit;
+        }
+        .filter-btn:hover { border-color:var(--gold-border); color:var(--gold); }
+        .filter-btn.active { border-color:var(--gold); background:var(--gold-dim); color:var(--gold); }
+
+        /* ── TABLE ── */
+        .table-wrap { background:var(--bg3); border:1px solid #1e1e1e; border-radius:16px; overflow:hidden; }
+        table { width:100%; border-collapse:collapse; }
+        thead { background:var(--bg4); }
+        thead th { padding:14px 16px; text-align:left; font-size:.75em; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; border-bottom:1px solid #1e1e1e; font-weight:700; white-space:nowrap; }
+        tbody tr { border-bottom:1px solid #1a1a1a; transition:background .15s; cursor:pointer; }
+        tbody tr:last-child { border-bottom:none; }
+        tbody tr:hover { background:var(--bg4); }
+        tbody td { padding:14px 16px; font-size:.88em; vertical-align:middle; }
+        .td-name { font-weight:700; color:#fff; }
+        .td-ticket { font-family:monospace; font-size:.8em; color:var(--muted); }
+        .td-work { color:#bbb; }
+        .td-budget { color:var(--gold); font-weight:700; }
+        .td-date { color:var(--muted); font-size:.82em; }
+
+        /* ── STATUS PILL ── */
+        .s-pill { padding:4px 12px; border-radius:50px; font-size:.75em; font-weight:700; border:1px solid; white-space:nowrap; display:inline-block; }
+        .s-pending   { border-color:#555; color:#888; }
+        .s-reviewing { border-color:var(--blue); color:var(--blue); background:rgba(52,152,219,.08); }
+        .s-accepted  { border-color:var(--green); color:var(--green); background:rgba(75,181,67,.08); }
+        .s-rejected  { border-color:var(--red); color:var(--red); background:rgba(231,76,60,.08); }
+        .s-working   { border-color:var(--yellow); color:var(--yellow); background:rgba(243,156,18,.08); }
+        .s-delivered { border-color:var(--purple); color:var(--purple); background:rgba(155,89,182,.08); }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:200;
+            display:none; align-items:center; justify-content:center; padding:20px;
+        }
+        .modal-overlay.open { display:flex; }
+        .modal {
+            background:var(--bg3); border:1px solid #2a2a2a; border-radius:20px;
+            width:100%; max-width:620px; max-height:90vh; overflow-y:auto;
+            animation:fadeUp .25s ease both;
+        }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .modal-header {
+            padding:24px 28px; border-bottom:1px solid #222;
+            display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:var(--bg3); z-index:1;
+        }
+        .modal-header h3 { font-size:1.2em; color:#fff; }
+        .modal-close { background:none; border:none; color:var(--muted); font-size:1.4em; cursor:pointer; transition:color .2s; }
+        .modal-close:hover { color:#fff; }
+        .modal-body { padding:28px; }
+
+        .modal-detail { margin-bottom:20px; }
+        .md-label { font-size:.75em; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; }
+        .md-value { color:#ddd; line-height:1.6; }
+
+        .modal-actions { margin-top:28px; }
+        .ma-label { font-size:.8em; color:var(--muted); margin-bottom:10px; font-weight:600; }
+        .status-btns { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+        .s-change-btn {
+            padding:9px 18px; border-radius:9px; cursor:pointer; border:1px solid #2a2a2a;
+            background:var(--bg2); color:var(--muted); font-size:.83em; font-weight:700;
+            transition:all .2s; font-family:inherit;
+        }
+        .s-change-btn:hover { border-color:var(--gold-border); color:var(--gold); }
+        .s-change-btn.current { border-color:var(--gold); background:var(--gold-dim); color:var(--gold); }
+
+        .note-area { width:100%; background:var(--bg2); border:1px solid #2a2a2a; border-radius:10px; padding:13px 16px; color:var(--text); font-size:.9em; font-family:inherit; resize:vertical; min-height:80px; outline:none; }
+        .note-area:focus { border-color:var(--gold-border); }
+        .save-modal-btn {
+            width:100%; margin-top:12px; padding:14px;
+            background:linear-gradient(135deg,var(--gold),var(--gold-light));
+            border:none; border-radius:10px; color:#0a0a0a; font-weight:800;
+            font-size:.95em; cursor:pointer; transition:all .2s;
+        }
+        .save-modal-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(212,175,55,.4); }
+
+        /* ── EMPTY / LOADING ── */
+        .empty-state { text-align:center; padding:60px; color:var(--muted); }
+        .empty-state .ei { font-size:3em; margin-bottom:12px; }
+
+        /* ── TOAST ── */
+        .toast {
+            position:fixed; bottom:28px; right:28px; z-index:999;
+            background:var(--bg3); border:1px solid var(--green); border-radius:12px;
+            padding:14px 20px; color:var(--green); font-weight:700; font-size:.9em;
+            display:none; align-items:center; gap:10px;
+            animation:slideIn .3s ease;
+        }
+        @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
+
+        @media(max-width:900px) {
+            .layout { grid-template-columns:1fr; }
+            .sidebar { display:none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div class="login-screen" id="loginScreen">
+    <div class="login-box">
+        <div class="logo">⚙️</div>
+        <h2>Admin Panel</h2>
+        <p>Enter your password to access</p>
+        <input type="password" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="login-btn" onclick="doLogin()">Access Panel</button>
+        <div class="login-err" id="loginErr">Incorrect password</div>
+    </div>
+</div>
+
+<!-- ── APP ── -->
+<div class="app" id="app">
+
+    <div class="topbar">
+        <div class="brand">⚙️ Commission Panel</div>
+        <div class="right">
+            <span style="color:var(--muted);font-size:.85em" id="lastUpdate"></span>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <!-- Status control -->
+            <div style="padding:16px 16px 0">
+                <div class="status-control">
+                    <div class="sc-label">Commission Status</div>
+                    <div class="sc-btns">
+                        <button class="sc-btn" id="sc-open"   onclick="selectStatus('open')">🟢 Open</button>
+                        <button class="sc-btn" id="sc-busy"   onclick="selectStatus('busy')">🟡 Busy (waitlist)</button>
+                        <button class="sc-btn" id="sc-closed" onclick="selectStatus('closed')">🔴 Closed</button>
+                    </div>
+                    <input class="slots-input" type="number" id="slotsInput" placeholder="Available slots (e.g. 2)" min="0">
+                    <button class="save-sc-btn" onclick="saveStatus()"><i class="fas fa-save"></i> Save status</button>
+                </div>
+            </div>
+
+            <!-- Nav -->
+            <div class="sidebar-section">
+                <div class="sidebar-label">Requests</div>
+                <button class="sidebar-btn active" id="nav-all" onclick="setFilter('all', this)">
+                    <i class="fas fa-list"></i> All <span class="badge" id="badge-all">0</span>
+                </button>
+                <button class="sidebar-btn" id="nav-pending" onclick="setFilter('pending', this)">
+                    <i class="fas fa-inbox"></i> Pending <span class="badge" id="badge-pending" style="background:var(--muted)">0</span>
+                </button>
+                <button class="sidebar-btn" id="nav-reviewing" onclick="setFilter('reviewing', this)">
+                    <i class="fas fa-search"></i> Reviewing
+                </button>
+                <button class="sidebar-btn" id="nav-working" onclick="setFilter('working', this)">
+                    <i class="fas fa-code"></i> In Progress
+                </button>
+                <button class="sidebar-btn" id="nav-delivered" onclick="setFilter('delivered', this)">
+                    <i class="fas fa-check"></i> Delivered
+                </button>
+            </div>
+        </aside>
+
+        <!-- CONTENT -->
+        <main class="content">
+
+            <!-- Stats -->
+            <div class="stats-row" id="statsRow"></div>
+
+            <!-- Filters -->
+            <div class="filters" id="filterRow"></div>
+
+            <!-- Table -->
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Roblox</th>
+                            <th>Type</th>
+                            <th>Budget</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Urgency</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+                <div class="empty-state" id="emptyState" style="display:none">
+                    <div class="ei">📭</div>
+                    <p>No requests found</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</div>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+        <div class="modal-header">
+            <h3 id="mTitle">Commission Detail</h3>
+            <button class="modal-close" onclick="closeModalDirect()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div id="mDetails"></div>
+            <div class="modal-actions">
+                <div class="ma-label">Change Status</div>
+                <div class="status-btns" id="mStatusBtns"></div>
+                <div class="ma-label" style="margin-top:16px">Message for client (optional)</div>
+                <textarea class="note-area" id="mNote" placeholder="e.g. Accepted! I'll contact you on Discord. Budget too low, please increase offer."></textarea>
+                <button class="save-modal-btn" onclick="saveTicketChanges()"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">Saved!</span></div>
+
+<script>
+// ══════════════════════════════════════════
+//  ⚠️  REPLACE THESE
+// ══════════════════════════════════════════
+const SUPABASE_URL      = 'https://gaxohanwkayubyzypmwu.supabase.co/rest/v1/';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdheG9oYW53a2F5dWJ5enlwbXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTk4NDIsImV4cCI6MjA5MjUzNTg0Mn0.940Rv8zOaC_Q8evvsD-3U0rXpoLF__vb83NrOkKOl78';
+const ADMIN_PASSWORD    = 'Dum@r_.21';  // e.g. 'Dumar2024!'
+// ══════════════════════════════════════════
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let allTickets = [];
+let currentFilter = 'all';
+let activeTicket = null;
+let currentStatus = 'open';
+
+// ── Login ──
+function doLogin() {
+    const pw = document.getElementById('pwInput').value;
+    if (pw === ADMIN_PASSWORD) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        init();
+    } else {
+        document.getElementById('loginErr').style.display = 'block';
+    }
+}
+
+function logout() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('pwInput').value = '';
+}
+
+// ── Init ──
+async function init() {
+    await loadConfig();
+    await loadTickets();
+}
+
+// ── Load config ──
+async function loadConfig() {
+    try {
+        const { data } = await sb.from('commission_config').select('*').single();
+        if (!data) return;
+        currentStatus = data.status || 'open';
+        updateStatusBtns(currentStatus);
+        if (data.slots_available != null) document.getElementById('slotsInput').value = data.slots_available;
+    } catch(e) {}
+}
+
+function updateStatusBtns(s) {
+    ['open','busy','closed'].forEach(k => {
+        const btn = document.getElementById('sc-'+k);
+        btn.className = 'sc-btn' + (k === s ? ` sc-active-${k}` : '');
+    });
+}
+
+function selectStatus(s) {
+    currentStatus = s;
+    updateStatusBtns(s);
+}
+
+async function saveStatus() {
+    const slots = parseInt(document.getElementById('slotsInput').value) || 0;
+    try {
+        await sb.from('commission_config').upsert({ id:1, status:currentStatus, slots_available:slots });
+        showToast('Status updated!');
+    } catch(e) { showToast('Error saving status'); }
+}
+
+// ── Load tickets ──
+async function loadTickets() {
+    const { data } = await sb.from('commissions').select('*').order('created_at', { ascending:false });
+    allTickets = data || [];
+    renderStats();
+    renderTable();
+    updateLastUpdate();
+    // auto-refresh every 30s
+    setTimeout(loadTickets, 30000);
+}
+
+// ── Stats ──
+const STAT_DEFS = [
+    { key:'all',       label:'Total',       color:'var(--gold)' },
+    { key:'pending',   label:'Pending',     color:'var(--muted)' },
+    { key:'reviewing', label:'Reviewing',   color:'var(--blue)' },
+    { key:'working',   label:'In Progress', color:'var(--yellow)' },
+    { key:'delivered', label:'Delivered',   color:'var(--green)' },
+];
+function renderStats() {
+    const row = document.getElementById('statsRow');
+    row.innerHTML = '';
+    STAT_DEFS.forEach(s => {
+        const count = s.key === 'all' ? allTickets.length : allTickets.filter(t => t.status === s.key).length;
+        row.innerHTML += `<div class="stat-card"><div class="sc-num" style="color:${s.color}">${count}</div><div class="sc-lbl">${s.label}</div></div>`;
+    });
+    // badges
+    document.getElementById('badge-all').textContent = allTickets.length;
+    const pending = allTickets.filter(t => t.status === 'pending').length;
+    const bp = document.getElementById('badge-pending');
+    bp.textContent = pending;
+    bp.style.display = pending > 0 ? '' : 'none';
+}
+
+// ── Table ──
+const WORK_LABELS = { new_game:'New game', system:'Script/System', ui:'UI Design', bug_fix:'Bug fix', collab:'Collab', other:'Other' };
+const PAY_LABELS  = { usd:'💵 USD', robux:'🎮 Robux', percent:'📊 %', discuss:'🤝 Discuss' };
+const URG_LABELS  = { no_rush:'😌', normal:'⏱', urgent:'🔥' };
+const STATUS_PILLS = {
+    pending:'s-pending', reviewing:'s-reviewing', accepted:'s-accepted',
+    rejected:'s-rejected', working:'s-working', delivered:'s-delivered'
+};
+const STATUS_LABELS = { pending:'Pending', reviewing:'Reviewing', accepted:'Accepted', rejected:'Rejected', working:'In Progress', delivered:'Delivered' };
+
+function renderTable() {
+    const filtered = currentFilter === 'all' ? allTickets : allTickets.filter(t => t.status === currentFilter);
+    const body = document.getElementById('tableBody');
+    const empty = document.getElementById('emptyState');
+    body.innerHTML = '';
+
+    if (filtered.length === 0) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+
+    filtered.forEach(t => {
+        const date = new Date(t.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+        const tr = document.createElement('tr');
+        tr.onclick = () => openModal(t);
+        tr.innerHTML = `
+            <td><div class="td-name">${t.client_name}</div><div class="td-ticket">${t.ticket_id}</div></td>
+            <td>${t.roblox_user}</td>
+            <td class="td-work">${WORK_LABELS[t.work_type] || t.work_type}</td>
+            <td class="td-budget">${t.budget}</td>
+            <td>${PAY_LABELS[t.payment_method] || t.payment_method}</td>
+            <td><span class="s-pill ${STATUS_PILLS[t.status]||''}">${STATUS_LABELS[t.status]||t.status}</span></td>
+            <td class="td-date">${date}</td>
+            <td>${URG_LABELS[t.urgency]||''} ${t.urgency||''}</td>`;
+        body.appendChild(tr);
+    });
+}
+
+// ── Sidebar filter ──
+function setFilter(f, el) {
+    currentFilter = f;
+    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    renderTable();
+}
+
+// ── Modal ──
+const ALL_STATUSES = ['pending','reviewing','accepted','rejected','working','delivered'];
+
+function openModal(t) {
+    activeTicket = t;
+    document.getElementById('mTitle').textContent = `${t.client_name} — ${t.ticket_id}`;
+    document.getElementById('mNote').value = t.admin_note || '';
+
+    const details = [
+        { label:'Roblox User',   value:t.roblox_user },
+        { label:'Type of Work',  value:WORK_LABELS[t.work_type]||t.work_type },
+        { label:'Budget',        value:t.budget },
+        { label:'Payment',       value:PAY_LABELS[t.payment_method]||t.payment_method },
+        { label:'Urgency',       value:t.urgency },
+        { label:'Contact',       value:t.contact_info||'—' },
+        { label:'Submitted',     value:new Date(t.created_at).toLocaleString() },
+        { label:'Description',   value:t.description },
+    ];
+    document.getElementById('mDetails').innerHTML = details.map(d =>
+        `<div class="modal-detail"><div class="md-label">${d.label}</div><div class="md-value">${d.value||'—'}</div></div>`
+    ).join('');
+
+    const btnRow = document.getElementById('mStatusBtns');
+    btnRow.innerHTML = ALL_STATUSES.map(s =>
+        `<button class="s-change-btn ${s===t.status?'current':''}" data-s="${s}" onclick="pickStatus('${s}',this)">${STATUS_LABELS[s]}</button>`
+    ).join('');
+
+    document.getElementById('modalOverlay').classList.add('open');
+}
+
+function pickStatus(s, btn) {
+    document.querySelectorAll('.s-change-btn').forEach(b => b.classList.remove('current'));
+    btn.classList.add('current');
+    activeTicket._newStatus = s;
+}
+
+async function saveTicketChanges() {
+    if (!activeTicket) return;
+    const newStatus = activeTicket._newStatus || activeTicket.status;
+    const note = document.getElementById('mNote').value.trim();
+    try {
+        await sb.from('commissions').update({ status:newStatus, admin_note:note }).eq('id', activeTicket.id);
+        // Update local
+        const idx = allTickets.findIndex(t => t.id === activeTicket.id);
+        if (idx > -1) { allTickets[idx].status = newStatus; allTickets[idx].admin_note = note; }
+        renderStats(); renderTable();
+        closeModalDirect();
+        showToast('Changes saved!');
+    } catch(e) { showToast('Error saving'); }
+}
+
+function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('open'); activeTicket = null; }
+
+// ── Toast ──
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.style.display = 'flex';
+    setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+
+function updateLastUpdate() {
+    document.getElementById('lastUpdate').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+}
+</script>
+</body>
+</html>
