@@ -396,7 +396,7 @@ const STATUS_PILLS  = { pending:'s-pending', reviewing:'s-reviewing', accepted:'
 const ALL_STATUSES  = ['pending','reviewing','accepted','rejected','working','delivered'];
 const DOT_COLORS    = { pending:'#555', reviewing:'var(--blue)', accepted:'var(--green)', rejected:'var(--red)', working:'var(--yellow)', delivered:'var(--purple)' };
 
-// LOGIN
+// ── LOGIN ──
 function doLogin() {
     if (document.getElementById('pwInput').value === ADMIN_PASSWORD) {
         document.getElementById('loginScreen').style.display = 'none';
@@ -407,6 +407,7 @@ function doLogin() {
     }
 }
 function logout() {
+    if (refreshTimer) { clearTimeout(refreshTimer); refreshTimer = null; }
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('app').style.display = 'none';
     document.getElementById('pwInput').value = '';
@@ -437,12 +438,18 @@ async function saveStatus() {
     } catch(e) { showToast('Error al guardar', true); }
 }
 
+// ── CARGA DE TICKETS ──
+// IMPORTANTE: cancelar siempre el timer anterior ANTES de hacer el fetch,
+// para evitar que dos ciclos corran en paralelo.
 async function loadTickets() {
-    if (refreshTimer) clearTimeout(refreshTimer);
+    if (refreshTimer) { clearTimeout(refreshTimer); refreshTimer = null; }
+
     const { data } = await sb.from('commissions').select('*').order('created_at', { ascending:false });
     allTickets = data || [];
     renderAll();
     document.getElementById('lastUpdate').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-CO');
+
+    // Programar la siguiente recarga en 30s
     refreshTimer = setTimeout(loadTickets, 30000);
 }
 
@@ -719,16 +726,13 @@ function renderPayHistory() {
     } else { sumEl.style.display = 'none'; }
 }
 
-// ── GUARDAR TICKET (fix del error 400) ──
+// ── GUARDAR TICKET ──
 async function saveTicketChanges() {
     if (!activeTicket) return;
     const newStatus = activeTicket._newStatus || activeTicket.status;
     const agreed = parseFloat(document.getElementById('mAgreed').value) || null;
     const currency = document.getElementById('mCurrency').value.trim() || null;
     const note = document.getElementById('mNote').value.trim() || null;
-
-    // Serializar explícitamente el array de pagos como JSON string y luego parsear
-    // para que Supabase reciba el tipo correcto (jsonb)
     const paymentsPayload = JSON.parse(JSON.stringify(mPayments));
 
     const updateData = {
@@ -752,7 +756,6 @@ async function saveTicketChanges() {
             return;
         }
 
-        // Actualizar en memoria local
         const idx = allTickets.findIndex(t => t.id === activeTicket.id);
         if (idx > -1) {
             allTickets[idx] = {
@@ -774,7 +777,7 @@ async function saveTicketChanges() {
     }
 }
 
-// ── ELIMINAR TICKET ──
+// ── ELIMINAR TICKET (BUG CORREGIDO) ──
 function confirmDeleteTicket() {
     if (!activeTicket) return;
     document.getElementById('confirmClientName').textContent = activeTicket.client_name;
@@ -789,23 +792,32 @@ async function executeDelete() {
     if (!activeTicket) return;
     const id = activeTicket.id;
     closeConfirm();
-    // Cancelar el auto-refresh para que no pise la eliminación
+
+    // Cancelar el timer ANTES de hacer el DELETE para que no haya
+    // ninguna recarga automática que pise la eliminación local.
     if (refreshTimer) { clearTimeout(refreshTimer); refreshTimer = null; }
+
     try {
         const { error } = await sb.from('commissions').delete().eq('id', id);
+
         if (error) {
             console.error('Delete error:', error);
             showToast('Error al eliminar: ' + (error.message || ''), true);
-            // Reanudar el refresh aunque haya fallado
+            // Reanudar ciclo normal si falló
             refreshTimer = setTimeout(loadTickets, 30000);
             return;
         }
+
+        // Eliminar de memoria local inmediatamente
         allTickets = allTickets.filter(t => t.id !== id);
         renderAll();
         closeModalDirect();
         showToast('Ticket eliminado correctamente');
-        // Reanudar el refresh después de 5s para dar tiempo a que la DB confirme
-        refreshTimer = setTimeout(loadTickets, 5000);
+
+        // ✅ CORRECCIÓN: reanudar el ciclo normal de 30s.
+        // NO recargar en 5s — eso era lo que hacía volver los tickets.
+        refreshTimer = setTimeout(loadTickets, 30000);
+
     } catch(e) {
         console.error(e);
         showToast('Error inesperado al eliminar', true);
