@@ -386,6 +386,7 @@ const ADMIN_PASSWORD    = 'Dum@r_.21';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let allTickets = [], currentFilter = 'all', activeTicket = null, currentStatus = 'open', mPayments = [];
+let refreshTimer = null;
 
 const WORK_LABELS   = { new_game:'Nuevo juego', system:'Script/Sistema', ui:'Diseño UI', bug_fix:'Corrección de bug', collab:'Colaboración', other:'Otro' };
 const PAY_LABELS    = { usd:'💵 USD', robux:'🎮 Robux', percent:'📊 %', discuss:'🤝 A acordar' };
@@ -437,11 +438,12 @@ async function saveStatus() {
 }
 
 async function loadTickets() {
+    if (refreshTimer) clearTimeout(refreshTimer);
     const { data } = await sb.from('commissions').select('*').order('created_at', { ascending:false });
     allTickets = data || [];
     renderAll();
     document.getElementById('lastUpdate').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-CO');
-    setTimeout(loadTickets, 30000);
+    refreshTimer = setTimeout(loadTickets, 30000);
 }
 
 function renderAll() { renderDashboard(); renderTicketsView(); renderDebtsView(); updateBadges(); }
@@ -787,20 +789,27 @@ async function executeDelete() {
     if (!activeTicket) return;
     const id = activeTicket.id;
     closeConfirm();
+    // Cancelar el auto-refresh para que no pise la eliminación
+    if (refreshTimer) { clearTimeout(refreshTimer); refreshTimer = null; }
     try {
         const { error } = await sb.from('commissions').delete().eq('id', id);
         if (error) {
             console.error('Delete error:', error);
             showToast('Error al eliminar: ' + (error.message || ''), true);
+            // Reanudar el refresh aunque haya fallado
+            refreshTimer = setTimeout(loadTickets, 30000);
             return;
         }
         allTickets = allTickets.filter(t => t.id !== id);
         renderAll();
         closeModalDirect();
         showToast('Ticket eliminado correctamente');
+        // Reanudar el refresh después de 5s para dar tiempo a que la DB confirme
+        refreshTimer = setTimeout(loadTickets, 5000);
     } catch(e) {
         console.error(e);
         showToast('Error inesperado al eliminar', true);
+        refreshTimer = setTimeout(loadTickets, 30000);
     }
 }
 
