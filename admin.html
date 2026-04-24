@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel – Dumar</title>
+    <title>Panel Admin – Dumar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -16,6 +16,8 @@
             --green:#4bb543; --red:#e74c3c; --yellow:#f39c12; --blue:#3498db; --purple:#9b59b6;
         }
         body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+        /* LOGIN */
         .login-screen { min-height:100vh; display:flex; align-items:center; justify-content:center; background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(212,175,55,.06) 0%,transparent 70%); }
         .login-box { background:var(--bg3); border:1px solid #222; border-radius:20px; padding:48px 40px; width:100%; max-width:420px; text-align:center; }
         .login-box .logo { font-size:2.5em; margin-bottom:8px; }
@@ -27,12 +29,16 @@
         .login-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(212,175,55,.4); }
         .login-err { color:var(--red); font-size:.85em; margin-top:10px; display:none; }
         .app { display:none; }
+
+        /* TOPBAR */
         .topbar { position:sticky; top:0; z-index:100; background:rgba(10,10,10,.97); backdrop-filter:blur(14px); border-bottom:1px solid #1a1a1a; padding:14px 28px; display:flex; justify-content:space-between; align-items:center; }
         .topbar .brand { font-size:1.15em; font-weight:800; color:var(--gold); display:flex; align-items:center; gap:10px; }
         .topbar .right { display:flex; align-items:center; gap:16px; }
         .topbar .ts { color:var(--muted); font-size:.8em; }
         .logout-btn { padding:7px 14px; background:transparent; border:1px solid #2a2a2a; border-radius:8px; color:var(--muted); cursor:pointer; font-size:.82em; transition:all .2s; }
         .logout-btn:hover { border-color:var(--red); color:var(--red); }
+
+        /* LAYOUT */
         .layout { display:grid; grid-template-columns:250px 1fr; min-height:calc(100vh - 52px); }
         .sidebar { background:var(--bg2); border-right:1px solid #161616; padding:20px 0; overflow-y:auto; }
         .sb-section { padding:0 14px; margin-bottom:24px; }
@@ -43,6 +49,8 @@
         .sb-btn.active { background:var(--gold-dim); color:var(--gold); }
         .sb-btn .badge { margin-left:auto; background:var(--red); color:#fff; font-size:.68em; font-weight:800; padding:2px 6px; border-radius:50px; min-width:18px; text-align:center; }
         .sb-btn .badge.yellow { background:var(--yellow); }
+
+        /* STATUS WIDGET */
         .status-widget { margin:14px; padding:14px; background:var(--bg3); border-radius:12px; border:1px solid #1e1e1e; }
         .sw-title { font-size:.68em; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-bottom:10px; font-weight:700; }
         .sw-btns { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
@@ -55,9 +63,12 @@
         .sw-input:focus { border-color:var(--gold-border); }
         .sw-save { width:100%; padding:8px; background:var(--gold-dim); border:1px solid var(--gold-border); border-radius:7px; color:var(--gold); font-weight:700; cursor:pointer; font-size:.8em; transition:all .2s; }
         .sw-save:hover { background:rgba(212,175,55,.25); }
+
+        /* CONTENT */
         .content { padding:24px; overflow-x:hidden; }
         .view { display:none; }
         .view.active { display:block; }
+
         /* KPIs */
         .kpi-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(195px,1fr)); gap:14px; margin-bottom:24px; }
         .kpi { background:var(--bg3); border:1px solid #1e1e1e; border-radius:14px; padding:20px 22px; position:relative; overflow:hidden; transition:border-color .25s; }
@@ -68,7 +79,8 @@
         .kpi-trend { position:absolute; top:16px; right:16px; font-size:.74em; font-weight:700; padding:3px 8px; border-radius:50px; }
         .trend-up { background:rgba(75,181,67,.15); color:var(--green); }
         .trend-down { background:rgba(231,76,60,.15); color:var(--red); }
-        /* Month comparison */
+
+        /* MONTH BARS */
         .month-compare { background:var(--bg3); border:1px solid #1e1e1e; border-radius:14px; padding:22px; margin-bottom:24px; }
         .mc-title { font-size:.9em; font-weight:700; color:#bbb; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
         .mc-title i { color:var(--gold); }
@@ -80,7 +92,8 @@
         .mc-bar.prev { background:rgba(212,175,55,.3); color:#a88a1e; }
         .mc-bar.curr { background:linear-gradient(90deg,var(--gold),var(--gold-light)); color:#0a0a0a; }
         .mc-amt { font-size:.78em; font-weight:700; color:#bbb; width:70px; flex-shrink:0; }
-        /* Debt cards */
+
+        /* DEBT CARDS */
         .section-hd { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
         .section-hd h3 { font-size:1em; font-weight:800; color:#ddd; display:flex; align-items:center; gap:8px; }
         .section-hd h3 i { color:var(--gold); }
@@ -101,14 +114,16 @@
         .debt-pay-btn:hover { background:rgba(75,181,67,.2); }
         .debt-empty { text-align:center; padding:40px; color:var(--muted); font-size:.9em; }
         .debt-empty .dei { font-size:2.5em; margin-bottom:10px; }
-        /* Activity */
+
+        /* ACTIVITY */
         .activity-list { display:flex; flex-direction:column; gap:8px; }
         .act-item { background:var(--bg3); border:1px solid #1a1a1a; border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:12px; }
         .act-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
         .act-text { flex:1; font-size:.83em; color:#bbb; }
         .act-text strong { color:#ddd; }
         .act-time { font-size:.74em; color:var(--muted); flex-shrink:0; }
-        /* Tickets view */
+
+        /* TICKETS TABLE */
         .tkt-stats { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; margin-bottom:18px; }
         .tkt-stat { background:var(--bg3); border:1px solid #1e1e1e; border-radius:11px; padding:14px 16px; }
         .tkt-stat .tsn { font-size:1.5em; font-weight:900; }
@@ -129,20 +144,22 @@
         .td-budget { color:var(--gold); font-weight:700; }
         .td-date { color:var(--muted); font-size:.8em; }
         .s-pill { padding:3px 10px; border-radius:50px; font-size:.72em; font-weight:700; border:1px solid; white-space:nowrap; display:inline-block; }
-        .s-pending { border-color:#444; color:#777; }
+        .s-pending   { border-color:#444; color:#777; }
         .s-reviewing { border-color:var(--blue); color:var(--blue); background:rgba(52,152,219,.08); }
-        .s-accepted { border-color:var(--green); color:var(--green); background:rgba(75,181,67,.08); }
-        .s-rejected { border-color:var(--red); color:var(--red); background:rgba(231,76,60,.08); }
-        .s-working { border-color:var(--yellow); color:var(--yellow); background:rgba(243,156,18,.08); }
+        .s-accepted  { border-color:var(--green); color:var(--green); background:rgba(75,181,67,.08); }
+        .s-rejected  { border-color:var(--red); color:var(--red); background:rgba(231,76,60,.08); }
+        .s-working   { border-color:var(--yellow); color:var(--yellow); background:rgba(243,156,18,.08); }
         .s-delivered { border-color:var(--purple); color:var(--purple); background:rgba(155,89,182,.08); }
         .empty-state { text-align:center; padding:50px; color:var(--muted); }
-        /* Modal */
+
+        /* MODAL */
         .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.82); z-index:200; display:none; align-items:center; justify-content:center; padding:16px; }
         .modal-overlay.open { display:flex; }
         .modal { background:var(--bg3); border:1px solid #2a2a2a; border-radius:18px; width:100%; max-width:640px; max-height:92vh; overflow-y:auto; animation:fadeUp .22s ease both; }
         @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-        .modal-header { padding:22px 26px; border-bottom:1px solid #202020; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:var(--bg3); z-index:1; }
-        .modal-header h3 { font-size:1.1em; color:#fff; }
+        .modal-header { padding:22px 26px; border-bottom:1px solid #202020; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; background:var(--bg3); z-index:1; gap:10px; }
+        .modal-header h3 { font-size:1.1em; color:#fff; flex:1; min-width:0; }
+        .modal-header-actions { display:flex; align-items:center; gap:8px; }
         .modal-close { background:none; border:none; color:var(--muted); font-size:1.3em; cursor:pointer; transition:color .2s; line-height:1; }
         .modal-close:hover { color:#fff; }
         .modal-body { padding:26px; }
@@ -174,29 +191,49 @@
         .note-area:focus { border-color:var(--gold-border); }
         .save-modal-btn { width:100%; margin-top:14px; padding:13px; background:linear-gradient(135deg,var(--gold),var(--gold-light)); border:none; border-radius:10px; color:#0a0a0a; font-weight:800; font-size:.92em; cursor:pointer; transition:all .2s; }
         .save-modal-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(212,175,55,.4); }
+        .delete-ticket-btn { padding:10px 16px; background:rgba(231,76,60,.08); border:1px solid rgba(231,76,60,.35); border-radius:9px; color:var(--red); font-weight:700; font-size:.82em; cursor:pointer; transition:all .2s; font-family:inherit; }
+        .delete-ticket-btn:hover { background:rgba(231,76,60,.18); border-color:var(--red); }
+
+        /* CONFIRM MODAL */
+        .confirm-overlay { position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:300; display:none; align-items:center; justify-content:center; padding:16px; }
+        .confirm-overlay.open { display:flex; }
+        .confirm-box { background:var(--bg3); border:1px solid #3a1a1a; border-radius:16px; width:100%; max-width:380px; padding:32px 28px; text-align:center; animation:fadeUp .2s ease both; }
+        .confirm-box .ci { font-size:2.5em; margin-bottom:14px; }
+        .confirm-box h3 { color:#fff; font-size:1.1em; margin-bottom:8px; }
+        .confirm-box p { color:var(--muted); font-size:.85em; margin-bottom:24px; line-height:1.5; }
+        .confirm-actions { display:flex; gap:10px; }
+        .confirm-cancel { flex:1; padding:11px; background:var(--bg2); border:1px solid #2a2a2a; border-radius:9px; color:#aaa; cursor:pointer; font-size:.9em; font-weight:700; transition:all .2s; font-family:inherit; }
+        .confirm-cancel:hover { border-color:#444; color:#ddd; }
+        .confirm-delete { flex:1; padding:11px; background:rgba(231,76,60,.12); border:1px solid var(--red); border-radius:9px; color:var(--red); cursor:pointer; font-size:.9em; font-weight:800; transition:all .2s; font-family:inherit; }
+        .confirm-delete:hover { background:rgba(231,76,60,.25); }
+
+        /* TOAST */
         .toast { position:fixed; bottom:24px; right:24px; z-index:999; background:var(--bg3); border:1px solid var(--green); border-radius:11px; padding:12px 18px; color:var(--green); font-weight:700; font-size:.88em; display:none; align-items:center; gap:10px; }
+        .toast.error { border-color:var(--red); color:var(--red); }
+
         @media(max-width:900px) { .layout { grid-template-columns:1fr; } .sidebar { display:none; } }
     </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div class="login-screen" id="loginScreen">
     <div class="login-box">
         <div class="logo">⚙️</div>
-        <h2>Admin Panel</h2>
+        <h2>Panel de Administración</h2>
         <p>Introduce tu contraseña para acceder</p>
-        <input type="password" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
-        <button class="login-btn" onclick="doLogin()">Panel de acceso</button>
+        <input type="password" id="pwInput" placeholder="Contraseña" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="login-btn" onclick="doLogin()">Acceder al panel</button>
         <div class="login-err" id="loginErr">Contraseña incorrecta</div>
     </div>
 </div>
 
 <div class="app" id="app">
     <div class="topbar">
-        <div class="brand">⚙️ Panel de la Comisión</div>
+        <div class="brand">⚙️ Panel de Comisiones</div>
         <div class="right">
             <span class="ts" id="lastUpdate"></span>
-            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Salir</button>
         </div>
     </div>
 
@@ -209,27 +246,27 @@
                     <button class="sw-btn" id="sw-busy"   onclick="selectStatus('busy')">🟡 Ocupada (lista de espera)</button>
                     <button class="sw-btn" id="sw-closed" onclick="selectStatus('closed')">🔴 Cerrada</button>
                 </div>
-                <input class="sw-input" type="number" id="slotsInput" placeholder="Slots available (e.g. 2)" min="0">
-                <button class="sw-save" onclick="saveStatus()"><i class="fas fa-save"></i> Save</button>
+                <input class="sw-input" type="number" id="slotsInput" placeholder="Cupos disponibles (ej: 2)" min="0">
+                <button class="sw-save" onclick="saveStatus()"><i class="fas fa-save"></i> Guardar</button>
             </div>
             <div class="sb-section">
-                <span class="sb-label">Navigation</span>
+                <span class="sb-label">Navegación</span>
                 <button class="sb-btn active" id="nav-dashboard" onclick="showView('dashboard',this)"><i class="fas fa-chart-line"></i> Panel</button>
-                <button class="sb-btn" id="nav-tickets"  onclick="showView('tickets',this)"><i class="fas fa-ticket-alt"></i> Todas las entradas <span class="badge" id="badge-pending">0</span></button>
-                <button class="sb-btn" id="nav-debts"    onclick="showView('debts',this)"><i class="fas fa-hand-holding-usd"></i> Pagos Pendientes <span class="badge yellow" id="badge-debts">0</span></button>
+                <button class="sb-btn" id="nav-tickets"  onclick="showView('tickets',this)"><i class="fas fa-ticket-alt"></i> Todas las solicitudes <span class="badge" id="badge-pending">0</span></button>
+                <button class="sb-btn" id="nav-debts"    onclick="showView('debts',this)"><i class="fas fa-hand-holding-usd"></i> Pagos pendientes <span class="badge yellow" id="badge-debts">0</span></button>
             </div>
             <div class="sb-section">
-                <span class="sb-label">Filter Tickets</span>
+                <span class="sb-label">Filtrar por estado</span>
                 <button class="sb-btn" onclick="goFilterTickets('pending')"><i class="fas fa-inbox"></i> Pendiente</button>
-                <button class="sb-btn" onclick="goFilterTickets('reviewing')"><i class="fas fa-search"></i> Revisión</button>
-                <button class="sb-btn" onclick="goFilterTickets('working')"><i class="fas fa-code"></i> En Progreso</button>
+                <button class="sb-btn" onclick="goFilterTickets('reviewing')"><i class="fas fa-search"></i> En revisión</button>
+                <button class="sb-btn" onclick="goFilterTickets('working')"><i class="fas fa-code"></i> En progreso</button>
                 <button class="sb-btn" onclick="goFilterTickets('delivered')"><i class="fas fa-check"></i> Entregado</button>
             </div>
         </aside>
 
         <main class="content">
 
-            <!-- DASHBOARD -->
+            <!-- PANEL PRINCIPAL -->
             <div class="view active" id="view-dashboard">
                 <div class="kpi-grid" id="kpiGrid"></div>
                 <div class="month-compare">
@@ -238,7 +275,7 @@
                 </div>
                 <div class="section-hd">
                     <h3><i class="fas fa-exclamation-triangle"></i> Clientes que te deben</h3>
-                    <span class="total-badge" id="dashDebtBadge" style="background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.3)">$0 adeudado</span>
+                    <span class="total-badge" id="dashDebtBadge" style="background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.3)">$0 pendiente</span>
                 </div>
                 <div class="debt-list" id="dashDebtList"></div>
                 <div class="section-hd" style="margin-top:24px">
@@ -254,20 +291,20 @@
                 <div class="table-wrap">
                     <table>
                         <thead><tr>
-                            <th>Client</th><th>Type</th><th>Presupuesto (dicho)</th>
-                            <th>Acordado $</th><th>Pagado</th><th>Adeudado</th>
+                            <th>Cliente</th><th>Tipo</th><th>Presupuesto (dicho)</th>
+                            <th>Acordado $</th><th>Pagado</th><th>Pendiente</th>
                             <th>Estado</th><th>Fecha</th>
                         </tr></thead>
                         <tbody id="tableBody"></tbody>
                     </table>
-                    <div class="empty-state" id="emptyState" style="display:none">📭 No se encontraron entradas</div>
+                    <div class="empty-state" id="emptyState" style="display:none">📭 No se encontraron solicitudes</div>
                 </div>
             </div>
 
-            <!-- DEBTS -->
+            <!-- DEUDAS -->
             <div class="view" id="view-debts">
                 <div class="section-hd">
-                    <h3><i class="fas fa-hand-holding-usd"></i> Todos los Pagos Pendientes</h3>
+                    <h3><i class="fas fa-hand-holding-usd"></i> Todos los pagos pendientes</h3>
                     <span class="total-badge" id="debtViewBadge" style="background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.3)">Cargando…</span>
                 </div>
                 <div class="debt-list" id="fullDebtList"></div>
@@ -277,12 +314,15 @@
     </div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL DETALLE TICKET -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
     <div class="modal">
         <div class="modal-header">
             <h3 id="mTitle">Detalle de la comisión</h3>
-            <button class="modal-close" onclick="closeModalDirect()"><i class="fas fa-times"></i></button>
+            <div class="modal-header-actions">
+                <button class="delete-ticket-btn" onclick="confirmDeleteTicket()"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                <button class="modal-close" onclick="closeModalDirect()"><i class="fas fa-times"></i></button>
+            </div>
         </div>
         <div class="modal-body">
             <div class="md-grid" id="mDetails"></div>
@@ -292,17 +332,17 @@
                 <div class="pay-row">
                     <div>
                         <div class="md-lbl" style="margin-bottom:6px">Monto acordado</div>
-                        <input class="pay-input" type="number" id="mAgreed" placeholder="e.g. 20" min="0" step="0.01" oninput="renderPayHistory()">
+                        <input class="pay-input" type="number" id="mAgreed" placeholder="ej: 20" min="0" step="0.01" oninput="renderPayHistory()">
                     </div>
                     <div>
-                        <div class="md-lbl" style="margin-bottom:6px">Moneda / billete</div>
+                        <div class="md-lbl" style="margin-bottom:6px">Moneda / tipo</div>
                         <input class="pay-input" type="text" id="mCurrency" placeholder="USD / Robux / %">
                     </div>
                 </div>
                 <div class="md-lbl" style="margin-bottom:6px">Registrar un pago recibido</div>
                 <div class="pay-row">
-                    <input class="pay-input" type="number" id="mPayAmount" placeholder="Amount" min="0" step="0.01">
-                    <input class="pay-input" type="text"   id="mPayNote"   placeholder="Note (e.g. half upfront)">
+                    <input class="pay-input" type="number" id="mPayAmount" placeholder="Monto" min="0" step="0.01">
+                    <input class="pay-input" type="text"   id="mPayNote"   placeholder="Nota (ej: anticipo, saldo)">
                 </div>
                 <button onclick="addPayment()" style="padding:9px 18px;background:rgba(75,181,67,.1);border:1px solid var(--green);border-radius:8px;color:var(--green);font-weight:700;cursor:pointer;font-size:.82em;transition:all .2s" onmouseover="this.style.background='rgba(75,181,67,.2)'" onmouseout="this.style.background='rgba(75,181,67,.1)'">
                     <i class="fas fa-plus"></i> Agregar pago
@@ -315,7 +355,7 @@
                 <div class="modal-section-title">🔄 Estado y mensaje</div>
                 <div class="status-btns" id="mStatusBtns"></div>
                 <div class="md-lbl" style="margin-bottom:6px">Mensaje para el cliente (opcional)</div>
-                <textarea class="note-area" id="mNote" placeholder="e.g. Accepted! I'll contact you on Discord."></textarea>
+                <textarea class="note-area" id="mNote" placeholder="ej: ¡Aceptado! Te contactaré por Discord."></textarea>
             </div>
 
             <button class="save-modal-btn" onclick="saveTicketChanges()"><i class="fas fa-save"></i> Guardar todos los cambios</button>
@@ -323,21 +363,34 @@
     </div>
 </div>
 
+<!-- MODAL CONFIRMAR ELIMINACIÓN -->
+<div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+        <div class="ci">🗑️</div>
+        <h3>¿Eliminar esta solicitud?</h3>
+        <p>Esta acción es <strong style="color:var(--red)">permanente</strong> y no se puede deshacer. El ticket de <span id="confirmClientName" style="color:#ddd;font-weight:700">este cliente</span> será borrado definitivamente.</p>
+        <div class="confirm-actions">
+            <button class="confirm-cancel" onclick="closeConfirm()"><i class="fas fa-times"></i> Cancelar</button>
+            <button class="confirm-delete" onclick="executeDelete()"><i class="fas fa-trash-alt"></i> Sí, eliminar</button>
+        </div>
+    </div>
+</div>
+
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">¡Guardado!</span></div>
 
 <script>
-const SUPABASE_URL      = 'https://gaxohanwkayubyzypmwu.supabase.co'; 
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdheG9oYW53a2F5dWJ5enlwbXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTk4NDIsImV4cCI6MjA5MjUzNTg0Mn0.940Rv8zOaC_Q8evvsD-3U0rXpoLF__vb83NrOkKOl78'; 
-const ADMIN_PASSWORD    = 'Dum@r_.21';  // e.g. 'Dumar2024!'
+const SUPABASE_URL      = 'https://gaxohanwkayubyzypmwu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdheG9oYW53a2F5dWJ5enlwbXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTk4NDIsImV4cCI6MjA5MjUzNTg0Mn0.940Rv8zOaC_Q8evvsD-3U0rXpoLF__vb83NrOkKOl78';
+const ADMIN_PASSWORD    = 'Dum@r_.21';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let allTickets = [], currentFilter = 'all', activeTicket = null, currentStatus = 'open', mPayments = [];
 
-const WORK_LABELS   = { new_game:'New game', system:'Script/System', ui:'UI Design', bug_fix:'Bug fix', collab:'Collab', other:'Other' };
-const PAY_LABELS    = { usd:'💵 USD', robux:'🎮 Robux', percent:'📊 %', discuss:'🤝 Discuss' };
-const URG_LABELS    = { no_rush:'😌 No rush', normal:'⏱ Normal', urgent:'🔥 Urgent' };
-const STATUS_LABELS = { pending:'Pending', reviewing:'Reviewing', accepted:'Accepted', rejected:'Rejected', working:'In Progress', delivered:'Delivered' };
+const WORK_LABELS   = { new_game:'Nuevo juego', system:'Script/Sistema', ui:'Diseño UI', bug_fix:'Corrección de bug', collab:'Colaboración', other:'Otro' };
+const PAY_LABELS    = { usd:'💵 USD', robux:'🎮 Robux', percent:'📊 %', discuss:'🤝 A acordar' };
+const URG_LABELS    = { no_rush:'😌 Sin prisa', normal:'⏱ Normal', urgent:'🔥 Urgente' };
+const STATUS_LABELS = { pending:'Pendiente', reviewing:'En revisión', accepted:'Aceptado', rejected:'Rechazado', working:'En progreso', delivered:'Entregado' };
 const STATUS_PILLS  = { pending:'s-pending', reviewing:'s-reviewing', accepted:'s-accepted', rejected:'s-rejected', working:'s-working', delivered:'s-delivered' };
 const ALL_STATUSES  = ['pending','reviewing','accepted','rejected','working','delivered'];
 const DOT_COLORS    = { pending:'#555', reviewing:'var(--blue)', accepted:'var(--green)', rejected:'var(--red)', working:'var(--yellow)', delivered:'var(--purple)' };
@@ -348,7 +401,9 @@ function doLogin() {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         init();
-    } else { document.getElementById('loginErr').style.display = 'block'; }
+    } else {
+        document.getElementById('loginErr').style.display = 'block';
+    }
 }
 function logout() {
     document.getElementById('loginScreen').style.display = 'flex';
@@ -375,15 +430,17 @@ function updateSwBtns(s) {
 function selectStatus(s) { currentStatus = s; updateSwBtns(s); }
 async function saveStatus() {
     const slots = parseInt(document.getElementById('slotsInput').value) || 0;
-    try { await sb.from('commission_config').upsert({ id:1, status:currentStatus, slots_available:slots }); showToast('Status updated!'); }
-    catch(e) { showToast('Error saving'); }
+    try {
+        await sb.from('commission_config').upsert({ id:1, status:currentStatus, slots_available:slots });
+        showToast('¡Estado actualizado!');
+    } catch(e) { showToast('Error al guardar', true); }
 }
 
 async function loadTickets() {
     const { data } = await sb.from('commissions').select('*').order('created_at', { ascending:false });
     allTickets = data || [];
     renderAll();
-    document.getElementById('lastUpdate').textContent = 'Updated ' + new Date().toLocaleTimeString();
+    document.getElementById('lastUpdate').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-CO');
     setTimeout(loadTickets, 30000);
 }
 
@@ -394,19 +451,36 @@ function showView(v, el) {
     document.getElementById('view-'+v).classList.add('active');
     document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('nav-'+v)?.classList.add('active');
-    if (el && !el.id.startsWith('nav-')) el.classList.add('active');
+    if (el && !el.id?.startsWith('nav-')) el.classList.add('active');
 }
-function goFilterTickets(s) { currentFilter = s; showView('tickets', null); renderTicketsView(); document.getElementById('nav-tickets').classList.add('active'); }
+function goFilterTickets(s) {
+    currentFilter = s;
+    showView('tickets', null);
+    renderTicketsView();
+    document.getElementById('nav-tickets').classList.add('active');
+}
 
 // ── DASHBOARD ──
 function renderDashboard() { renderKPIs(); renderMonthBars(); renderDashDebts(); renderActivity(); }
 
 function getMonthTickets(offset=0) {
     const ref = new Date(); ref.setMonth(ref.getMonth()+offset);
-    return allTickets.filter(t => { const d=new Date(t.created_at); return d.getFullYear()===ref.getFullYear() && d.getMonth()===ref.getMonth(); });
+    return allTickets.filter(t => {
+        const d = new Date(t.created_at);
+        return d.getFullYear()===ref.getFullYear() && d.getMonth()===ref.getMonth();
+    });
 }
-function sumPayments(tickets) { return tickets.reduce((s,t)=>s+(t.payments_received||[]).reduce((a,p)=>a+(parseFloat(p.amount)||0),0),0); }
-function sumOwed(tickets)    { return tickets.reduce((s,t)=>{ if(!t.agreed_amount) return s; const paid=(t.payments_received||[]).reduce((a,p)=>a+(parseFloat(p.amount)||0),0); const o=parseFloat(t.agreed_amount)-paid; return s+(o>0?o:0); },0); }
+function sumPayments(tickets) {
+    return tickets.reduce((s,t) => s + (t.payments_received||[]).reduce((a,p) => a+(parseFloat(p.amount)||0), 0), 0);
+}
+function sumOwed(tickets) {
+    return tickets.reduce((s,t) => {
+        if (!t.agreed_amount) return s;
+        const paid = (t.payments_received||[]).reduce((a,p) => a+(parseFloat(p.amount)||0), 0);
+        const o = parseFloat(t.agreed_amount) - paid;
+        return s + (o>0 ? o : 0);
+    }, 0);
+}
 
 function renderKPIs() {
     const mo=getMonthTickets(0), lm=getMonthTickets(-1);
@@ -415,13 +489,13 @@ function renderKPIs() {
     const diff = earnLm>0 ? ((earnMo-earnLm)/earnLm*100).toFixed(0) : null;
     const trend = diff!==null ? `<span class="kpi-trend ${diff>=0?'trend-up':'trend-down'}">${diff>=0?'▲':'▼'} ${Math.abs(diff)}%</span>` : '';
     const kpis = [
-        { icon:'💵', val:'$'+earnMo.toFixed(2), lbl:'Earned this month', color:'var(--gold)', extra:trend },
-        { icon:'📅', val:'$'+earnLm.toFixed(2), lbl:'Earned last month',  color:'#aaa' },
-        { icon:'💰', val:'$'+earnAll.toFixed(2), lbl:'Total earned (all time)', color:'var(--green)' },
-        { icon:'⚠️', val:'$'+owed.toFixed(2),   lbl:'Total owed to you', color:'var(--red)' },
-        { icon:'📥', val:allTickets.filter(t=>t.status==='pending').length, lbl:'Pending requests', color:'#777' },
-        { icon:'🔧', val:allTickets.filter(t=>t.status==='working').length, lbl:'In progress', color:'var(--yellow)' },
-        { icon:'📦', val:allTickets.length, lbl:'Total commissions', color:'var(--blue)' },
+        { icon:'💵', val:'$'+earnMo.toFixed(2), lbl:'Ganado este mes', color:'var(--gold)', extra:trend },
+        { icon:'📅', val:'$'+earnLm.toFixed(2), lbl:'Ganado el mes pasado', color:'#aaa' },
+        { icon:'💰', val:'$'+earnAll.toFixed(2), lbl:'Total ganado (histórico)', color:'var(--green)' },
+        { icon:'⚠️', val:'$'+owed.toFixed(2), lbl:'Total que te deben', color:'var(--red)' },
+        { icon:'📥', val:allTickets.filter(t=>t.status==='pending').length, lbl:'Solicitudes pendientes', color:'#777' },
+        { icon:'🔧', val:allTickets.filter(t=>t.status==='working').length, lbl:'En progreso', color:'var(--yellow)' },
+        { icon:'📦', val:allTickets.length, lbl:'Total de comisiones', color:'var(--blue)' },
     ];
     document.getElementById('kpiGrid').innerHTML = kpis.map(k=>`
         <div class="kpi">
@@ -433,14 +507,18 @@ function renderKPIs() {
 }
 
 function renderMonthBars() {
-    const months=[];
-    for(let i=-4;i<=0;i++) {
-        const d=new Date(); d.setMonth(d.getMonth()+i);
-        months.push({ label:d.toLocaleDateString('en-US',{month:'short',year:'2-digit'}), amt:sumPayments(getMonthTickets(i)), isCurr:i===0 });
+    const months = [];
+    for(let i=-4; i<=0; i++) {
+        const d = new Date(); d.setMonth(d.getMonth()+i);
+        months.push({
+            label: d.toLocaleDateString('es-CO',{month:'short',year:'2-digit'}),
+            amt: sumPayments(getMonthTickets(i)),
+            isCurr: i===0
+        });
     }
-    const max=Math.max(...months.map(m=>m.amt),1);
-    document.getElementById('mcBars').innerHTML = months.map(m=>{
-        const pct=(m.amt/max*100).toFixed(1);
+    const max = Math.max(...months.map(m=>m.amt), 1);
+    document.getElementById('mcBars').innerHTML = months.map(m => {
+        const pct = (m.amt/max*100).toFixed(1);
         return `<div class="mc-row">
             <div class="mc-month-lbl">${m.label}</div>
             <div class="mc-bar-wrap"><div class="mc-bar ${m.isCurr?'curr':'prev'}" style="width:${pct}%">${pct>18?'$'+m.amt.toFixed(0):''}</div></div>
@@ -451,14 +529,17 @@ function renderMonthBars() {
 
 function getDebtors() {
     return allTickets
-        .filter(t=>t.agreed_amount>0)
-        .map(t=>{ const paid=(t.payments_received||[]).reduce((s,p)=>s+(parseFloat(p.amount)||0),0); return {...t,paid,owed:parseFloat(t.agreed_amount)-paid}; })
-        .filter(t=>t.owed>0.001)
-        .sort((a,b)=>b.owed-a.owed);
+        .filter(t => t.agreed_amount > 0)
+        .map(t => {
+            const paid = (t.payments_received||[]).reduce((s,p) => s+(parseFloat(p.amount)||0), 0);
+            return {...t, paid, owed: parseFloat(t.agreed_amount) - paid};
+        })
+        .filter(t => t.owed > 0.001)
+        .sort((a,b) => b.owed-a.owed);
 }
 
 function debtCardHTML(d) {
-    const pct = Math.min(100,(d.paid/d.agreed_amount*100)).toFixed(0);
+    const pct = Math.min(100, (d.paid/d.agreed_amount*100)).toFixed(0);
     const ini = d.client_name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     return `<div class="debt-card">
         <div class="debt-avatar">${ini}</div>
@@ -469,26 +550,26 @@ function debtCardHTML(d) {
             <div class="debt-progress"><div class="debt-progress-fill" style="width:${pct}%"></div></div>
         </div>
         <div class="debt-amounts">
-            <div class="debt-agreed">Agreed: $${parseFloat(d.agreed_amount).toFixed(2)}</div>
-            <div class="debt-agreed">Paid: $${d.paid.toFixed(2)} (${pct}%)</div>
-            <div class="debt-owed">Owes $${d.owed.toFixed(2)}</div>
+            <div class="debt-agreed">Acordado: $${parseFloat(d.agreed_amount).toFixed(2)}</div>
+            <div class="debt-agreed">Pagado: $${d.paid.toFixed(2)} (${pct}%)</div>
+            <div class="debt-owed">Debe $${d.owed.toFixed(2)}</div>
         </div>
         <button class="debt-pay-btn" onclick="event.stopPropagation();openModal(allTickets.find(t=>t.id===${d.id}))">
-            <i class="fas fa-plus"></i> Register
+            <i class="fas fa-plus"></i> Registrar
         </button>
     </div>`;
 }
 
 function renderDashDebts() {
-    const d=getDebtors(), total=d.reduce((s,x)=>s+x.owed,0);
-    document.getElementById('dashDebtBadge').textContent='$'+total.toFixed(2)+' owed';
+    const d = getDebtors(), total = d.reduce((s,x)=>s+x.owed, 0);
+    document.getElementById('dashDebtBadge').textContent = '$'+total.toFixed(2)+' pendiente';
     document.getElementById('dashDebtList').innerHTML = d.length===0
-        ? '<div class="debt-empty"><div class="dei">🎉</div>Nobody owes you anything!</div>'
+        ? '<div class="debt-empty"><div class="dei">🎉</div>¡Nadie te debe nada!</div>'
         : d.slice(0,5).map(debtCardHTML).join('');
 }
 
 function renderActivity() {
-    const recent=[...allTickets].sort((a,b)=>new Date(b.updated_at||b.created_at)-new Date(a.updated_at||a.created_at)).slice(0,6);
+    const recent = [...allTickets].sort((a,b)=>new Date(b.updated_at||b.created_at)-new Date(a.updated_at||a.created_at)).slice(0,6);
     document.getElementById('activityList').innerHTML = recent.map(t=>`
         <div class="act-item">
             <div class="act-dot" style="background:${DOT_COLORS[t.status]||'#555'}"></div>
@@ -497,139 +578,252 @@ function renderActivity() {
         </div>`).join('');
 }
 
-// ── DEBTS VIEW ──
+// ── VISTA DE DEUDAS ──
 function renderDebtsView() {
-    const d=getDebtors(), total=d.reduce((s,x)=>s+x.owed,0);
-    document.getElementById('debtViewBadge').textContent='$'+total.toFixed(2)+' total owed';
-    document.getElementById('badge-debts').textContent=d.length;
+    const d = getDebtors(), total = d.reduce((s,x)=>s+x.owed, 0);
+    document.getElementById('debtViewBadge').textContent = '$'+total.toFixed(2)+' total pendiente';
+    document.getElementById('badge-debts').textContent = d.length;
     document.getElementById('fullDebtList').innerHTML = d.length===0
-        ? '<div class="debt-empty"><div class="dei">🎉</div>All clients are up to date!</div>'
+        ? '<div class="debt-empty"><div class="dei">🎉</div>¡Todos los clientes están al día!</div>'
         : d.map(debtCardHTML).join('');
 }
 
-// ── TICKETS TABLE ──
+// ── TABLA DE TICKETS ──
 function renderTicketsView() {
-    const statuses=['pending','reviewing','working','accepted','rejected','delivered'];
-    const colors={pending:'#777',reviewing:'var(--blue)',working:'var(--yellow)',accepted:'var(--green)',rejected:'var(--red)',delivered:'var(--purple)'};
-    document.getElementById('tktStats').innerHTML=statuses.map(s=>`
+    const statuses = ['pending','reviewing','working','accepted','rejected','delivered'];
+    const colors = { pending:'#777', reviewing:'var(--blue)', working:'var(--yellow)', accepted:'var(--green)', rejected:'var(--red)', delivered:'var(--purple)' };
+    document.getElementById('tktStats').innerHTML = statuses.map(s=>`
         <div class="tkt-stat">
             <div class="tsn" style="color:${colors[s]}">${allTickets.filter(t=>t.status===s).length}</div>
             <div class="tsl">${STATUS_LABELS[s]}</div>
         </div>`).join('');
 
-    const filterDefs=[{k:'all',l:'All'},...statuses.map(k=>({k,l:STATUS_LABELS[k]}))];
-    document.getElementById('tktFilters').innerHTML=filterDefs.map(f=>
+    const filterDefs = [{k:'all',l:'Todos'}, ...statuses.map(k=>({k, l:STATUS_LABELS[k]}))];
+    document.getElementById('tktFilters').innerHTML = filterDefs.map(f=>
         `<button class="tf-btn ${currentFilter===f.k?'active':''}" onclick="setFilter('${f.k}',this)">${f.l}</button>`
     ).join('');
 
-    const filtered=currentFilter==='all'?allTickets:allTickets.filter(t=>t.status===currentFilter);
-    const body=document.getElementById('tableBody');
-    document.getElementById('emptyState').style.display=filtered.length===0?'block':'none';
-    body.innerHTML='';
-    filtered.forEach(t=>{
-        const paid=(t.payments_received||[]).reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
-        const owed=t.agreed_amount>0?Math.max(0,parseFloat(t.agreed_amount)-paid):null;
-        const date=new Date(t.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-        const tr=document.createElement('tr');
-        tr.onclick=()=>openModal(t);
-        tr.innerHTML=`
+    const filtered = currentFilter==='all' ? allTickets : allTickets.filter(t=>t.status===currentFilter);
+    const body = document.getElementById('tableBody');
+    document.getElementById('emptyState').style.display = filtered.length===0 ? 'block' : 'none';
+    body.innerHTML = '';
+    filtered.forEach(t => {
+        const paid = (t.payments_received||[]).reduce((s,p)=>s+(parseFloat(p.amount)||0), 0);
+        const owed = t.agreed_amount>0 ? Math.max(0, parseFloat(t.agreed_amount)-paid) : null;
+        const date = new Date(t.created_at).toLocaleDateString('es-CO',{month:'short',day:'numeric'});
+        const tr = document.createElement('tr');
+        tr.onclick = () => openModal(t);
+        tr.innerHTML = `
             <td><div class="td-name">${t.client_name}</div><div class="td-ticket">${t.ticket_id}</div></td>
             <td style="color:#bbb;font-size:.83em">${WORK_LABELS[t.work_type]||t.work_type}</td>
             <td class="td-budget">${t.budget}</td>
             <td style="color:#bbb;font-size:.83em">${t.agreed_amount?'$'+parseFloat(t.agreed_amount).toFixed(2):'—'}</td>
             <td style="color:var(--green);font-weight:700;font-size:.85em">${t.agreed_amount?'$'+paid.toFixed(2):'—'}</td>
-            <td style="font-weight:800;font-size:.85em;color:${owed>0?'var(--red)':'var(--green)'}">${owed!==null?(owed>0?'$'+owed.toFixed(2):'✓ Paid'):'—'}</td>
+            <td style="font-weight:800;font-size:.85em;color:${owed>0?'var(--red)':'var(--green)'}">${owed!==null?(owed>0?'$'+owed.toFixed(2):'✓ Pagado'):'—'}</td>
             <td><span class="s-pill ${STATUS_PILLS[t.status]||''}">${STATUS_LABELS[t.status]||t.status}</span></td>
             <td class="td-date">${date}</td>`;
         body.appendChild(tr);
     });
 }
 
-function setFilter(f,el) {
-    currentFilter=f;
+function setFilter(f, el) {
+    currentFilter = f;
     document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
     el?.classList.add('active');
     renderTicketsView();
 }
 
 function updateBadges() {
-    const p=allTickets.filter(t=>t.status==='pending').length;
-    const bp=document.getElementById('badge-pending');
-    bp.textContent=p; bp.style.display=p>0?'':'none';
+    const p = allTickets.filter(t=>t.status==='pending').length;
+    const bp = document.getElementById('badge-pending');
+    bp.textContent = p; bp.style.display = p>0 ? '' : 'none';
 }
 
 // ── MODAL ──
 function openModal(t) {
     if (!t) return;
-    activeTicket={...t}; mPayments=[...(t.payments_received||[])];
-    document.getElementById('mTitle').textContent=`${t.client_name} — ${t.ticket_id}`;
-    document.getElementById('mNote').value=t.admin_note||'';
-    document.getElementById('mAgreed').value=t.agreed_amount||'';
-    document.getElementById('mCurrency').value=t.agreed_currency||'';
-    document.getElementById('mPayAmount').value=''; document.getElementById('mPayNote').value='';
-    const dets=[
-        {l:'Roblox User',v:t.roblox_user},{l:'Work Type',v:WORK_LABELS[t.work_type]||t.work_type},
-        {l:'Budget (client said)',v:t.budget},{l:'Payment Method',v:PAY_LABELS[t.payment_method]||t.payment_method},
-        {l:'Urgency',v:URG_LABELS[t.urgency]||t.urgency},{l:'Contact',v:t.contact_info||'—'},
-        {l:'Submitted',v:new Date(t.created_at).toLocaleString()},{l:'Description',v:t.description,full:true}
+    activeTicket = {...t};
+    mPayments = [...(t.payments_received||[])];
+    document.getElementById('mTitle').textContent = `${t.client_name} — ${t.ticket_id}`;
+    document.getElementById('mNote').value = t.admin_note||'';
+    document.getElementById('mAgreed').value = t.agreed_amount||'';
+    document.getElementById('mCurrency').value = t.agreed_currency||'';
+    document.getElementById('mPayAmount').value = '';
+    document.getElementById('mPayNote').value = '';
+    const dets = [
+        {l:'Usuario Roblox', v:t.roblox_user},
+        {l:'Tipo de trabajo', v:WORK_LABELS[t.work_type]||t.work_type},
+        {l:'Presupuesto (cliente)', v:t.budget},
+        {l:'Método de pago', v:PAY_LABELS[t.payment_method]||t.payment_method},
+        {l:'Urgencia', v:URG_LABELS[t.urgency]||t.urgency},
+        {l:'Contacto', v:t.contact_info||'—'},
+        {l:'Enviado el', v:new Date(t.created_at).toLocaleString('es-CO')},
+        {l:'Descripción', v:t.description, full:true}
     ];
-    document.getElementById('mDetails').innerHTML=dets.map(d=>`<div class="md-item${d.full?' full':''}"><div class="md-lbl">${d.l}</div><div class="md-val">${d.v||'—'}</div></div>`).join('');
-    document.getElementById('mStatusBtns').innerHTML=ALL_STATUSES.map(s=>`<button class="s-change-btn ${s===t.status?'current':''}" onclick="pickStatus('${s}',this)">${STATUS_LABELS[s]}</button>`).join('');
+    document.getElementById('mDetails').innerHTML = dets.map(d=>`
+        <div class="md-item${d.full?' full':''}">
+            <div class="md-lbl">${d.l}</div>
+            <div class="md-val">${d.v||'—'}</div>
+        </div>`).join('');
+    document.getElementById('mStatusBtns').innerHTML = ALL_STATUSES.map(s=>
+        `<button class="s-change-btn ${s===t.status?'current':''}" onclick="pickStatus('${s}',this)">${STATUS_LABELS[s]}</button>`
+    ).join('');
     renderPayHistory();
     document.getElementById('modalOverlay').classList.add('open');
 }
 
-function pickStatus(s,btn) { document.querySelectorAll('.s-change-btn').forEach(b=>b.classList.remove('current')); btn.classList.add('current'); activeTicket._newStatus=s; }
+function pickStatus(s, btn) {
+    document.querySelectorAll('.s-change-btn').forEach(b=>b.classList.remove('current'));
+    btn.classList.add('current');
+    activeTicket._newStatus = s;
+}
 
 function addPayment() {
-    const amount=parseFloat(document.getElementById('mPayAmount').value);
-    if (!amount||amount<=0) { showToast('Enter a valid amount'); return; }
-    mPayments.push({amount,note:document.getElementById('mPayNote').value.trim(),date:new Date().toISOString()});
-    document.getElementById('mPayAmount').value=''; document.getElementById('mPayNote').value='';
+    const amount = parseFloat(document.getElementById('mPayAmount').value);
+    if (!amount || amount<=0) { showToast('Ingresa un monto válido', true); return; }
+    mPayments.push({
+        amount,
+        note: document.getElementById('mPayNote').value.trim(),
+        date: new Date().toISOString()
+    });
+    document.getElementById('mPayAmount').value = '';
+    document.getElementById('mPayNote').value = '';
     renderPayHistory();
 }
-function removePayment(i) { mPayments.splice(i,1); renderPayHistory(); }
+
+function removePayment(i) { mPayments.splice(i, 1); renderPayHistory(); }
 
 function renderPayHistory() {
-    const agreed=parseFloat(document.getElementById('mAgreed').value)||0;
-    const totalPaid=mPayments.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
-    const owed=agreed>0?Math.max(0,agreed-totalPaid):null;
+    const agreed = parseFloat(document.getElementById('mAgreed').value) || 0;
+    const totalPaid = mPayments.reduce((s,p) => s+(parseFloat(p.amount)||0), 0);
+    const owed = agreed>0 ? Math.max(0, agreed-totalPaid) : null;
     document.getElementById('mPayHistory').innerHTML = mPayments.length===0
-        ? '<div style="color:var(--muted);font-size:.8em;padding:8px 0">No payments registered yet</div>'
-        : mPayments.map((p,i)=>`<div class="pay-entry">
-            <div class="pay-entry-info">$${parseFloat(p.amount).toFixed(2)} ${p.note?'· '+p.note:''} <span style="color:var(--muted)">· ${new Date(p.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span></div>
-            <div style="display:flex;align-items:center;gap:8px"><span class="pay-entry-amount">+$${parseFloat(p.amount).toFixed(2)}</span><button class="pay-entry-del" onclick="removePayment(${i})"><i class="fas fa-times"></i></button></div>
+        ? '<div style="color:var(--muted);font-size:.8em;padding:8px 0">Sin pagos registrados aún</div>'
+        : mPayments.map((p,i) => `<div class="pay-entry">
+            <div class="pay-entry-info">$${parseFloat(p.amount).toFixed(2)} ${p.note?'· '+p.note:''} <span style="color:var(--muted)">· ${new Date(p.date).toLocaleDateString('es-CO',{month:'short',day:'numeric'})}</span></div>
+            <div style="display:flex;align-items:center;gap:8px">
+                <span class="pay-entry-amount">+$${parseFloat(p.amount).toFixed(2)}</span>
+                <button class="pay-entry-del" onclick="removePayment(${i})"><i class="fas fa-times"></i></button>
+            </div>
           </div>`).join('');
-    const sumEl=document.getElementById('mPaySummary');
-    if (mPayments.length>0) {
-        sumEl.style.display='flex';
-        sumEl.innerHTML=`
-            <div class="ps-item"><div class="ps-val" style="color:var(--gold)">$${agreed>0?agreed.toFixed(2):'—'}</div><div class="ps-lbl">Agreed</div></div>
-            <div class="ps-item"><div class="ps-val" style="color:var(--green)">$${totalPaid.toFixed(2)}</div><div class="ps-lbl">Received</div></div>
-            <div class="ps-item"><div class="ps-val" style="color:${owed>0?'var(--red)':'var(--green)'}">${owed!==null?'$'+owed.toFixed(2):'—'}</div><div class="ps-lbl">Still owed</div></div>`;
-    } else { sumEl.style.display='none'; }
+
+    const sumEl = document.getElementById('mPaySummary');
+    if (mPayments.length > 0) {
+        sumEl.style.display = 'flex';
+        sumEl.innerHTML = `
+            <div class="ps-item"><div class="ps-val" style="color:var(--gold)">$${agreed>0?agreed.toFixed(2):'—'}</div><div class="ps-lbl">Acordado</div></div>
+            <div class="ps-item"><div class="ps-val" style="color:var(--green)">$${totalPaid.toFixed(2)}</div><div class="ps-lbl">Recibido</div></div>
+            <div class="ps-item"><div class="ps-val" style="color:${owed>0?'var(--red)':'var(--green)'}">${owed!==null?'$'+owed.toFixed(2):'—'}</div><div class="ps-lbl">Pendiente</div></div>`;
+    } else { sumEl.style.display = 'none'; }
 }
 
+// ── GUARDAR TICKET (fix del error 400) ──
 async function saveTicketChanges() {
     if (!activeTicket) return;
-    const newStatus=activeTicket._newStatus||activeTicket.status;
-    const agreed=parseFloat(document.getElementById('mAgreed').value)||null;
+    const newStatus = activeTicket._newStatus || activeTicket.status;
+    const agreed = parseFloat(document.getElementById('mAgreed').value) || null;
+    const currency = document.getElementById('mCurrency').value.trim() || null;
+    const note = document.getElementById('mNote').value.trim() || null;
+
+    // Serializar explícitamente el array de pagos como JSON string y luego parsear
+    // para que Supabase reciba el tipo correcto (jsonb)
+    const paymentsPayload = JSON.parse(JSON.stringify(mPayments));
+
+    const updateData = {
+        status: newStatus,
+        updated_at: new Date().toISOString()
+    };
+    if (note !== null) updateData.admin_note = note;
+    if (agreed !== null) updateData.agreed_amount = agreed;
+    if (currency !== null) updateData.agreed_currency = currency;
+    updateData.payments_received = paymentsPayload;
+
     try {
-        await sb.from('commissions').update({
-            status:newStatus, admin_note:document.getElementById('mNote').value.trim(),
-            agreed_amount:agreed, agreed_currency:document.getElementById('mCurrency').value.trim(),
-            payments_received:mPayments, updated_at:new Date().toISOString()
-        }).eq('id',activeTicket.id);
-        const idx=allTickets.findIndex(t=>t.id===activeTicket.id);
-        if(idx>-1) allTickets[idx]={...allTickets[idx],status:newStatus,admin_note:document.getElementById('mNote').value.trim(),agreed_amount:agreed,agreed_currency:document.getElementById('mCurrency').value.trim(),payments_received:mPayments};
-        renderAll(); closeModalDirect(); showToast('Changes saved!');
-    } catch(e) { showToast('Error saving'); }
+        const { error } = await sb
+            .from('commissions')
+            .update(updateData)
+            .eq('id', activeTicket.id);
+
+        if (error) {
+            console.error('Supabase error:', error);
+            showToast('Error: ' + (error.message || 'No se pudo guardar'), true);
+            return;
+        }
+
+        // Actualizar en memoria local
+        const idx = allTickets.findIndex(t => t.id === activeTicket.id);
+        if (idx > -1) {
+            allTickets[idx] = {
+                ...allTickets[idx],
+                status: newStatus,
+                admin_note: note,
+                agreed_amount: agreed,
+                agreed_currency: currency,
+                payments_received: paymentsPayload,
+                updated_at: updateData.updated_at
+            };
+        }
+        renderAll();
+        closeModalDirect();
+        showToast('¡Cambios guardados!');
+    } catch(e) {
+        console.error(e);
+        showToast('Error inesperado al guardar', true);
+    }
 }
 
-function closeModal(e) { if(e.target===document.getElementById('modalOverlay')) closeModalDirect(); }
-function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('open'); activeTicket=null; }
-function showToast(msg) { const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=msg; t.style.display='flex'; setTimeout(()=>{t.style.display='none';},3000); }
-function timeAgo(ds) { const m=Math.floor((Date.now()-new Date(ds))/60000); if(m<1)return'just now'; if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
+// ── ELIMINAR TICKET ──
+function confirmDeleteTicket() {
+    if (!activeTicket) return;
+    document.getElementById('confirmClientName').textContent = activeTicket.client_name;
+    document.getElementById('confirmOverlay').classList.add('open');
+}
+
+function closeConfirm() {
+    document.getElementById('confirmOverlay').classList.remove('open');
+}
+
+async function executeDelete() {
+    if (!activeTicket) return;
+    const id = activeTicket.id;
+    closeConfirm();
+    try {
+        const { error } = await sb.from('commissions').delete().eq('id', id);
+        if (error) {
+            console.error('Delete error:', error);
+            showToast('Error al eliminar: ' + (error.message || ''), true);
+            return;
+        }
+        allTickets = allTickets.filter(t => t.id !== id);
+        renderAll();
+        closeModalDirect();
+        showToast('Ticket eliminado correctamente');
+    } catch(e) {
+        console.error(e);
+        showToast('Error inesperado al eliminar', true);
+    }
+}
+
+function closeModal(e) { if(e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('open'); activeTicket = null; }
+
+function showToast(msg, isError=false) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.className = 'toast' + (isError ? ' error' : '');
+    t.querySelector('i').className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+    t.style.display = 'flex';
+    setTimeout(() => { t.style.display = 'none'; }, 3500);
+}
+
+function timeAgo(ds) {
+    const m = Math.floor((Date.now()-new Date(ds))/60000);
+    if (m<1) return 'justo ahora';
+    if (m<60) return m+'m';
+    const h = Math.floor(m/60);
+    if (h<24) return h+'h';
+    return Math.floor(h/24)+'d';
+}
 </script>
 
 </body>
