@@ -184,16 +184,16 @@
     <div class="login-box">
         <div class="logo">⚙️</div>
         <h2>Admin Panel</h2>
-        <p>Enter your password to access</p>
+        <p>Introduce tu contraseña para acceder</p>
         <input type="password" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
-        <button class="login-btn" onclick="doLogin()">Access Panel</button>
-        <div class="login-err" id="loginErr">Incorrect password</div>
+        <button class="login-btn" onclick="doLogin()">Panel de acceso</button>
+        <div class="login-err" id="loginErr">Contraseña incorrecta</div>
     </div>
 </div>
 
 <div class="app" id="app">
     <div class="topbar">
-        <div class="brand">⚙️ Commission Panel</div>
+        <div class="brand">⚙️ Panel de la Comisión</div>
         <div class="right">
             <span class="ts" id="lastUpdate"></span>
             <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -203,27 +203,27 @@
     <div class="layout">
         <aside class="sidebar">
             <div class="status-widget">
-                <div class="sw-title">Commission Status</div>
+                <div class="sw-title">Estado de la Comisión</div>
                 <div class="sw-btns">
-                    <button class="sw-btn" id="sw-open"   onclick="selectStatus('open')">🟢 Open</button>
-                    <button class="sw-btn" id="sw-busy"   onclick="selectStatus('busy')">🟡 Busy (waitlist)</button>
-                    <button class="sw-btn" id="sw-closed" onclick="selectStatus('closed')">🔴 Closed</button>
+                    <button class="sw-btn" id="sw-open"   onclick="selectStatus('open')">🟢 Abierta</button>
+                    <button class="sw-btn" id="sw-busy"   onclick="selectStatus('busy')">🟡 Ocupada (lista de espera)</button>
+                    <button class="sw-btn" id="sw-closed" onclick="selectStatus('closed')">🔴 Cerrada</button>
                 </div>
                 <input class="sw-input" type="number" id="slotsInput" placeholder="Slots available (e.g. 2)" min="0">
                 <button class="sw-save" onclick="saveStatus()"><i class="fas fa-save"></i> Save</button>
             </div>
             <div class="sb-section">
                 <span class="sb-label">Navigation</span>
-                <button class="sb-btn active" id="nav-dashboard" onclick="showView('dashboard',this)"><i class="fas fa-chart-line"></i> Dashboard</button>
-                <button class="sb-btn" id="nav-tickets"  onclick="showView('tickets',this)"><i class="fas fa-ticket-alt"></i> All Tickets <span class="badge" id="badge-pending">0</span></button>
-                <button class="sb-btn" id="nav-debts"    onclick="showView('debts',this)"><i class="fas fa-hand-holding-usd"></i> Pending Payments <span class="badge yellow" id="badge-debts">0</span></button>
+                <button class="sb-btn active" id="nav-dashboard" onclick="showView('dashboard',this)"><i class="fas fa-chart-line"></i> Panel</button>
+                <button class="sb-btn" id="nav-tickets"  onclick="showView('tickets',this)"><i class="fas fa-ticket-alt"></i> Todas las entradas <span class="badge" id="badge-pending">0</span></button>
+                <button class="sb-btn" id="nav-debts"    onclick="showView('debts',this)"><i class="fas fa-hand-holding-usd"></i> Pagos Pendientes <span class="badge yellow" id="badge-debts">0</span></button>
             </div>
             <div class="sb-section">
                 <span class="sb-label">Filter Tickets</span>
-                <button class="sb-btn" onclick="goFilterTickets('pending')"><i class="fas fa-inbox"></i> Pending</button>
-                <button class="sb-btn" onclick="goFilterTickets('reviewing')"><i class="fas fa-search"></i> Reviewing</button>
-                <button class="sb-btn" onclick="goFilterTickets('working')"><i class="fas fa-code"></i> In Progress</button>
-                <button class="sb-btn" onclick="goFilterTickets('delivered')"><i class="fas fa-check"></i> Delivered</button>
+                <button class="sb-btn" onclick="goFilterTickets('pending')"><i class="fas fa-inbox"></i> Pendiente</button>
+                <button class="sb-btn" onclick="goFilterTickets('reviewing')"><i class="fas fa-search"></i> Revisión</button>
+                <button class="sb-btn" onclick="goFilterTickets('working')"><i class="fas fa-code"></i> En Progreso</button>
+                <button class="sb-btn" onclick="goFilterTickets('delivered')"><i class="fas fa-check"></i> Entregado</button>
             </div>
         </aside>
 
@@ -233,16 +233,16 @@
             <div class="view active" id="view-dashboard">
                 <div class="kpi-grid" id="kpiGrid"></div>
                 <div class="month-compare">
-                    <div class="mc-title"><i class="fas fa-chart-bar"></i> Monthly Revenue — Last 5 months (USD)</div>
-                    <div class="mc-bars" id="mcBars"><div style="color:var(--muted);font-size:.85em;padding:8px 0">Loading…</div></div>
+                    <div class="mc-title"><i class="fas fa-chart-bar"></i> Ingresos mensuales — Últimos 5 meses (USD)</div>
+                    <div class="mc-bars" id="mcBars"><div style="color:var(--muted);font-size:.85em;padding:8px 0">Cargando…</div></div>
                 </div>
                 <div class="section-hd">
-                    <h3><i class="fas fa-exclamation-triangle"></i> Clients who owe you</h3>
-                    <span class="total-badge" id="dashDebtBadge" style="background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.3)">$0 owed</span>
+                    <h3><i class="fas fa-exclamation-triangle"></i> Clientes que te deben</h3>
+                    <span class="total-badge" id="dashDebtBadge" style="background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.3)">$0 adeudado</span>
                 </div>
                 <div class="debt-list" id="dashDebtList"></div>
                 <div class="section-hd" style="margin-top:24px">
-                    <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                    <h3><i class="fas fa-clock"></i> Actividad Reciente</h3>
                 </div>
                 <div class="activity-list" id="activityList"></div>
             </div>
@@ -254,21 +254,21 @@
                 <div class="table-wrap">
                     <table>
                         <thead><tr>
-                            <th>Client</th><th>Type</th><th>Budget (said)</th>
-                            <th>Agreed $</th><th>Paid</th><th>Owed</th>
-                            <th>Status</th><th>Date</th>
+                            <th>Client</th><th>Type</th><th>Presupuesto (dicho)</th>
+                            <th>Acordado $</th><th>Pagado</th><th>Adeudado</th>
+                            <th>Estado</th><th>Fecha</th>
                         </tr></thead>
                         <tbody id="tableBody"></tbody>
                     </table>
-                    <div class="empty-state" id="emptyState" style="display:none">📭 No tickets found</div>
+                    <div class="empty-state" id="emptyState" style="display:none">📭 No se encontraron entradas</div>
                 </div>
             </div>
 
             <!-- DEBTS -->
             <div class="view" id="view-debts">
                 <div class="section-hd">
-                    <h3><i class="fas fa-hand-holding-usd"></i> All Pending Payments</h3>
-                    <span class="total-badge" id="debtViewBadge" style="background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.3)">Loading…</span>
+                    <h3><i class="fas fa-hand-holding-usd"></i> Todos los Pagos Pendientes</h3>
+                    <span class="total-badge" id="debtViewBadge" style="background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.3)">Cargando…</span>
                 </div>
                 <div class="debt-list" id="fullDebtList"></div>
             </div>
@@ -281,49 +281,49 @@
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
     <div class="modal">
         <div class="modal-header">
-            <h3 id="mTitle">Commission Detail</h3>
+            <h3 id="mTitle">Detalle de la comisión</h3>
             <button class="modal-close" onclick="closeModalDirect()"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-body">
             <div class="md-grid" id="mDetails"></div>
 
             <div class="modal-section">
-                <div class="modal-section-title">💰 Payment Tracking</div>
+                <div class="modal-section-title">💰 Seguimiento de Pagos</div>
                 <div class="pay-row">
                     <div>
-                        <div class="md-lbl" style="margin-bottom:6px">Agreed amount</div>
+                        <div class="md-lbl" style="margin-bottom:6px">Monto acordado</div>
                         <input class="pay-input" type="number" id="mAgreed" placeholder="e.g. 20" min="0" step="0.01" oninput="renderPayHistory()">
                     </div>
                     <div>
-                        <div class="md-lbl" style="margin-bottom:6px">Currency / note</div>
+                        <div class="md-lbl" style="margin-bottom:6px">Moneda / billete</div>
                         <input class="pay-input" type="text" id="mCurrency" placeholder="USD / Robux / %">
                     </div>
                 </div>
-                <div class="md-lbl" style="margin-bottom:6px">Register a payment received</div>
+                <div class="md-lbl" style="margin-bottom:6px">Registrar un pago recibido</div>
                 <div class="pay-row">
                     <input class="pay-input" type="number" id="mPayAmount" placeholder="Amount" min="0" step="0.01">
                     <input class="pay-input" type="text"   id="mPayNote"   placeholder="Note (e.g. half upfront)">
                 </div>
                 <button onclick="addPayment()" style="padding:9px 18px;background:rgba(75,181,67,.1);border:1px solid var(--green);border-radius:8px;color:var(--green);font-weight:700;cursor:pointer;font-size:.82em;transition:all .2s" onmouseover="this.style.background='rgba(75,181,67,.2)'" onmouseout="this.style.background='rgba(75,181,67,.1)'">
-                    <i class="fas fa-plus"></i> Add Payment
+                    <i class="fas fa-plus"></i> Agregar pago
                 </button>
                 <div class="pay-history" id="mPayHistory"></div>
                 <div class="pay-summary" id="mPaySummary" style="display:none"></div>
             </div>
 
             <div class="modal-section">
-                <div class="modal-section-title">🔄 Status & Message</div>
+                <div class="modal-section-title">🔄 Estado y mensaje</div>
                 <div class="status-btns" id="mStatusBtns"></div>
-                <div class="md-lbl" style="margin-bottom:6px">Message for client (optional)</div>
+                <div class="md-lbl" style="margin-bottom:6px">Mensaje para el cliente (opcional)</div>
                 <textarea class="note-area" id="mNote" placeholder="e.g. Accepted! I'll contact you on Discord."></textarea>
             </div>
 
-            <button class="save-modal-btn" onclick="saveTicketChanges()"><i class="fas fa-save"></i> Save All Changes</button>
+            <button class="save-modal-btn" onclick="saveTicketChanges()"><i class="fas fa-save"></i> Guardar todos los cambios</button>
         </div>
     </div>
 </div>
 
-<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">Saved!</span></div>
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">¡Guardado!</span></div>
 
 <script>
 const SUPABASE_URL      = 'https://gaxohanwkayubyzypmwu.supabase.co'; 
@@ -632,12 +632,5 @@ function showToast(msg) { const t=document.getElementById('toast'); document.get
 function timeAgo(ds) { const m=Math.floor((Date.now()-new Date(ds))/60000); if(m<1)return'just now'; if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
 </script>
 
-<!-- ⚠️ RUN THIS IN SUPABASE SQL EDITOR to add the new columns:
-ALTER TABLE commissions
-  ADD COLUMN IF NOT EXISTS agreed_amount     NUMERIC,
-  ADD COLUMN IF NOT EXISTS agreed_currency   TEXT,
-  ADD COLUMN IF NOT EXISTS payments_received JSONB DEFAULT '[]'::jsonb,
-  ADD COLUMN IF NOT EXISTS updated_at        TIMESTAMPTZ DEFAULT NOW();
--->
 </body>
 </html>
