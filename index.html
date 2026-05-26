@@ -377,6 +377,78 @@
             margin-top: 8px;
         }
 
+        .portfolio-categories {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+
+        .category-card {
+            background: rgba(212, 175, 55, 0.05);
+            padding: 40px 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            text-decoration: none;
+            width: 100%;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .category-card:hover::before {
+            left: 100%;
+        }
+
+        .category-card:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.2);
+            border-color: #d4af37;
+        }
+
+        .category-icon {
+            font-size: 3.5em;
+            color: #d4af37;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .category-card:hover .category-icon {
+            transform: scale(1.1);
+        }
+
+        .category-title {
+            color: #ffffff;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .category-desc {
+            color: #b0b0b0;
+            font-size: 0.95em;
+            line-height: 1.5;
+            text-align: center;
+        }
+
         .projects-section {
             padding: 40px 0;
         }
@@ -1019,10 +1091,10 @@
         <div class="nav-container">
             <div class="nav-logo" onclick="scrollToTop()">Dumar</div>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="#home" class="nav-link" onclick="scrollToTop()">Home</a></li>
-                <li><a href="#clients" class="nav-link">Clients</a></li>
-                <li><a href="#projects" class="nav-link">Projects</a></li>
-                <li><a href="#systems" class="nav-link">Systems</a></li>
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="web.html" class="nav-link">Web</a></li>
+                <li><a href="app.html" class="nav-link">App</a></li>
+                <li><a href="juegos.html" class="nav-link">Juegos</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
                 <li><a href="commissions.html" class="nav-link">Commissions</a></li>
             </ul>
@@ -1039,53 +1111,31 @@
             <div class="particles" id="particles"></div>
             <div class="hero-content">
                 <h1>Dumar Jose Saldaña Alvear</h1>
-                <p class="tagline">Programmer & UI Designer</p>
+                <p class="tagline">Software Developer & UI Designer</p>
 
                 <div class="bio">
-                    Roblox programmer specialized in creating unique experiences and incredible worlds.
-                    With more than 4 years of experience in advanced scripting and interface design,
-                    I transform ideas into playable experiences that captivate users.
+                    Specialized in creating unique web experiences, functional applications, and incredible game worlds.
+                    With more than 4 years of experience, I transform ideas into digital products that captivate users.
                 </div>
 
-                <div class="typewriter-container">
-                    <span class="typewriter" id="typewriter"></span>
-                    <span class="typewriter-cursor"></span>
-                </div>
-
-                <div class="stats">
-                    <div class="stat-item">
-                        <div class="stat-number" id="projectCount">0</div>
-                        <div class="stat-label">Projects</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="systemCount">0</div>
-                        <div class="stat-label">Systems</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">+4</div>
-                        <div class="stat-label">Years</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">100%</div>
-                        <div class="stat-label">Dedication</div>
-                    </div>
+                <div class="portfolio-categories">
+                    <a href="web.html" class="category-card">
+                        <div class="category-icon"><i class="fas fa-laptop-code"></i></div>
+                        <h2 class="category-title">Web</h2>
+                        <p class="category-desc">Modern, responsive, and performant websites.</p>
+                    </a>
+                    <a href="app.html" class="category-card">
+                        <div class="category-icon"><i class="fas fa-mobile-alt"></i></div>
+                        <h2 class="category-title">App</h2>
+                        <p class="category-desc">Intuitive mobile & desktop applications.</p>
+                    </a>
+                    <a href="juegos.html" class="category-card">
+                        <div class="category-icon"><i class="fas fa-gamepad"></i></div>
+                        <h2 class="category-title">Juegos</h2>
+                        <p class="category-desc">Immersive experiences and systems in Roblox.</p>
+                    </a>
                 </div>
             </div>
-        </section>
-
-        <section id="clients" class="clients-section reveal">
-            <h2 class="section-title">Featured clients</h2>
-            <div id="clientsGrid" class="clients-grid"></div>
-        </section>
-
-        <section id="projects" class="projects-section reveal">
-            <h2 class="section-title">My Projects</h2>
-            <div id="projectsGrid" class="projects-grid"></div>
-        </section>
-
-        <section id="systems" class="systems-section reveal">
-            <h2 class="section-title">My Systems</h2>
-            <div id="systemsGrid" class="systems-grid"></div>
         </section>
 
         <section id="contact" class="contact-section reveal">
@@ -1903,4 +1953,3 @@
 
 
 </html>
-
