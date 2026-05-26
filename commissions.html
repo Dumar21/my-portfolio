@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +8,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
 
         :root {
             --gold: #d4af37;
             --gold-light: #f4d03f;
-            --gold-dim: rgba(212,175,55,0.15);
-            --gold-border: rgba(212,175,55,0.3);
+            --gold-dim: rgba(212, 175, 55, 0.15);
+            --gold-border: rgba(212, 175, 55, 0.3);
             --bg: #0a0a0a;
             --bg2: #141414;
             --bg3: #1a1a1a;
@@ -28,550 +37,1276 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #e0e0e0;
             min-height: 100vh;
         }
 
         /* ── NAVBAR ── */
         .navbar {
-            position: fixed; top: 0; left: 0; right: 0;
-            background: rgba(20,20,20,0.96);
-            backdrop-filter: blur(12px);
-            padding: 18px 0; z-index: 1000;
-            border-bottom: 1px solid var(--gold-border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            transform: translateY(-100%);
+            animation: slideDown 0.5s ease forwards 0.3s;
         }
+
+        @keyframes slideDown {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.98);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+        }
+
         .nav-container {
-            max-width: 1100px; margin: 0 auto; padding: 0 24px;
-            display: flex; justify-content: space-between; align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+
         .nav-logo {
-            font-size: 1.4em; font-weight: 800;
-            background: linear-gradient(135deg, #fff 0%, var(--gold) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; text-decoration: none;
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffffff 0%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: transform 0.3s ease;
         }
-        .nav-links { display: flex; gap: 32px; list-style: none; }
-        .nav-links a {
-            color: var(--text); text-decoration: none; font-weight: 500;
-            transition: color .2s; font-size: .95em;
+
+        .nav-logo:hover {
+            transform: scale(1.05);
         }
-        .nav-links a:hover { color: var(--gold); }
+
+        .nav-menu {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        @media (max-width: 968px) {
+            .nav-menu {
+                position: fixed;
+                top: -100%;
+                left: 0;
+                flex-direction: column;
+                background: rgba(10, 10, 10, 0.98);
+                width: 100%;
+                padding: 20px;
+                gap: 20px;
+                transition: top 0.3s ease;
+                border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+                backdrop-filter: blur(10px);
+                z-index: 999;
+            }
+
+            .nav-menu.active {
+                top: 70px;
+            }
+
+            .nav-toggle {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                cursor: pointer;
+                padding: 5px;
+                transition: all 0.3s ease;
+                z-index: 1000;
+            }
+
+            .nav-toggle span {
+                width: 25px;
+                height: 3px;
+                background: #d4af37;
+                transition: all 0.3s ease;
+                transform-origin: center;
+            }
+
+            .nav-toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(6px, 6px);
+            }
+
+            .nav-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .nav-toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(6px, -6px);
+            }
+        }
+
+        .nav-link {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+            font-size: 16px;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #d4af37, #f4d03f);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #d4af37;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .nav-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #d4af37;
+            transition: all 0.3s ease;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #d4af37;
+            border-radius: 50%;
+            animation: float 15s infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0);
+            }
+
+            50% {
+                transform: translateY(-100px) translateX(50px);
+            }
+        }
 
         /* ── HERO ── */
         .hero {
             padding: 130px 24px 70px;
             text-align: center;
-            background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(212,175,55,0.08) 0%, transparent 70%);
+            background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+            position: relative;
+            overflow: hidden;
         }
+
         .hero h1 {
             font-size: clamp(2.2em, 5vw, 3.6em);
-            font-weight: 800; line-height: 1.1;
+            font-weight: 800;
+            line-height: 1.1;
             background: linear-gradient(135deg, #fff 30%, var(--gold) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; margin-bottom: 16px;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
         }
-        .hero p { color: var(--muted); font-size: 1.1em; max-width: 560px; margin: 0 auto 40px; line-height: 1.7; }
+
+        .hero p {
+            color: var(--muted);
+            font-size: 1.1em;
+            max-width: 560px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+        }
 
         /* ── STATUS BADGE ── */
         .status-banner {
-            display: inline-flex; align-items: center; gap: 12px;
-            padding: 14px 28px; border-radius: 50px;
-            border: 1px solid; font-weight: 700; font-size: 1.05em;
-            margin-bottom: 20px; transition: all .3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 28px;
+            border-radius: 50px;
+            border: 1px solid;
+            font-weight: 700;
+            font-size: 1.05em;
+            margin-bottom: 20px;
+            transition: all .3s;
         }
-        .status-banner.open   { border-color: var(--green); color: var(--green); background: rgba(75,181,67,.1); }
-        .status-banner.busy   { border-color: var(--yellow); color: var(--yellow); background: rgba(243,156,18,.1); }
-        .status-banner.closed { border-color: var(--red); color: var(--red); background: rgba(231,76,60,.1); }
+
+        .status-banner.open {
+            border-color: var(--green);
+            color: var(--green);
+            background: rgba(75, 181, 67, .1);
+        }
+
+        .status-banner.busy {
+            border-color: var(--yellow);
+            color: var(--yellow);
+            background: rgba(243, 156, 18, .1);
+        }
+
+        .status-banner.closed {
+            border-color: var(--red);
+            color: var(--red);
+            background: rgba(231, 76, 60, .1);
+        }
+
         .status-dot {
-            width: 10px; height: 10px; border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
             animation: pulse-dot 1.5s infinite;
         }
-        .open .status-dot   { background: var(--green); }
-        .busy .status-dot   { background: var(--yellow); }
-        .closed .status-dot { background: var(--red); animation: none; }
-        @keyframes pulse-dot {
-            0%,100% { transform: scale(1); opacity: 1; }
-            50%      { transform: scale(1.5); opacity: .6; }
+
+        .open .status-dot {
+            background: var(--green);
         }
 
-        .slots-info { color: var(--muted); font-size: .9em; margin-bottom: 8px; }
+        .busy .status-dot {
+            background: var(--yellow);
+        }
+
+        .closed .status-dot {
+            background: var(--red);
+            animation: none;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: .6;
+            }
+        }
+
+        .slots-info {
+            color: var(--muted);
+            font-size: .9em;
+            margin-bottom: 8px;
+        }
 
         /* ── MAIN LAYOUT ── */
-        .main { max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
+        .main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
 
         /* ── FAQ ── */
         .section-label {
-            font-size: .7em; letter-spacing: .15em; text-transform: uppercase;
-            color: var(--gold); font-weight: 700; margin-bottom: 10px;
+            font-size: .7em;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 10px;
         }
+
         .section-title {
-            font-size: 1.9em; font-weight: 800; color: #fff;
-            margin-bottom: 32px; position: relative; padding-bottom: 14px;
+            font-size: 1.9em;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 32px;
+            position: relative;
+            padding-bottom: 14px;
         }
+
         .section-title::after {
-            content: ''; position: absolute; bottom: 0; left: 0;
-            width: 50px; height: 3px;
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
             background: linear-gradient(90deg, var(--gold), transparent);
         }
 
-        .faq-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 70px; }
+        .faq-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 70px;
+        }
+
         .faq-item {
-            background: var(--bg3); border: 1px solid #2a2a2a;
-            border-radius: 14px; overflow: hidden; transition: border-color .2s;
+            background: var(--bg3);
+            border: 1px solid #2a2a2a;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color .2s;
         }
-        .faq-item:hover { border-color: var(--gold-border); }
+
+        .faq-item:hover {
+            border-color: var(--gold-border);
+        }
+
         .faq-q {
-            padding: 20px 24px; cursor: pointer;
-            display: flex; justify-content: space-between; align-items: center;
-            font-weight: 600; font-size: 1em; user-select: none;
+            padding: 20px 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1em;
+            user-select: none;
         }
-        .faq-q:hover { color: var(--gold); }
-        .faq-icon { color: var(--gold); font-size: 1.1em; transition: transform .3s; flex-shrink: 0; }
-        .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+        .faq-q:hover {
+            color: var(--gold);
+        }
+
+        .faq-icon {
+            color: var(--gold);
+            font-size: 1.1em;
+            transition: transform .3s;
+            flex-shrink: 0;
+        }
+
+        .faq-item.open .faq-icon {
+            transform: rotate(45deg);
+        }
+
         .faq-a {
-            max-height: 0; overflow: hidden;
+            max-height: 0;
+            overflow: hidden;
             transition: max-height .35s ease, padding .3s;
-            color: var(--muted); line-height: 1.7; font-size: .95em;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: .95em;
             padding: 0 24px;
         }
-        .faq-item.open .faq-a { max-height: 300px; padding: 0 24px 20px; }
+
+        .faq-item.open .faq-a {
+            max-height: 300px;
+            padding: 0 24px 20px;
+        }
 
         /* ── FORM CARD ── */
         .form-card {
-            background: var(--bg3); border: 1px solid #2a2a2a;
-            border-radius: 20px; padding: 48px;
-            position: relative; overflow: hidden;
+            background: var(--bg3);
+            border: 1px solid #2a2a2a;
+            border-radius: 20px;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
         }
+
         .form-card::before {
-            content: ''; position: absolute;
-            top: 0; left: 0; right: 0; height: 3px;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
             background: linear-gradient(90deg, transparent, var(--gold), transparent);
         }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-group { display: flex; flex-direction: column; gap: 8px; }
-        .form-group.full { grid-column: 1 / -1; }
-
-        label { font-size: .85em; font-weight: 600; color: #bbb; letter-spacing: .03em; }
-        label span.req { color: var(--gold); margin-left: 3px; }
-
-        input, textarea, select {
-            background: var(--bg2); border: 1px solid #2e2e2e;
-            border-radius: 10px; padding: 13px 16px;
-            color: var(--text); font-size: .95em;
-            font-family: inherit; transition: border-color .2s, box-shadow .2s;
-            outline: none; width: 100%;
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
-        input:focus, textarea:focus, select:focus {
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: .85em;
+            font-weight: 600;
+            color: #bbb;
+            letter-spacing: .03em;
+        }
+
+        label span.req {
+            color: var(--gold);
+            margin-left: 3px;
+        }
+
+        input,
+        textarea,
+        select {
+            background: var(--bg2);
+            border: 1px solid #2e2e2e;
+            border-radius: 10px;
+            padding: 13px 16px;
+            color: var(--text);
+            font-size: .95em;
+            font-family: inherit;
+            transition: border-color .2s, box-shadow .2s;
+            outline: none;
+            width: 100%;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
             border-color: var(--gold-border);
-            box-shadow: 0 0 0 3px rgba(212,175,55,.08);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, .08);
         }
-        textarea { resize: vertical; min-height: 120px; }
-        select option { background: var(--bg2); }
 
-        .budget-wrap { position: relative; }
-        .budget-wrap input { padding-left: 36px; }
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        select option {
+            background: var(--bg2);
+        }
+
+        .budget-wrap {
+            position: relative;
+        }
+
+        .budget-wrap input {
+            padding-left: 36px;
+        }
+
         .budget-prefix {
-            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            color: var(--gold); font-weight: 700; font-size: .95em; pointer-events: none;
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-weight: 700;
+            font-size: .95em;
+            pointer-events: none;
         }
 
-        .payment-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+        .payment-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
         .chip {
-            padding: 8px 16px; border-radius: 8px; cursor: pointer;
-            border: 1px solid #2e2e2e; background: var(--bg2);
-            color: var(--muted); font-size: .85em; font-weight: 600;
-            transition: all .2s; user-select: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 1px solid #2e2e2e;
+            background: var(--bg2);
+            color: var(--muted);
+            font-size: .85em;
+            font-weight: 600;
+            transition: all .2s;
+            user-select: none;
         }
-        .chip:hover { border-color: var(--gold-border); color: var(--gold); }
-        .chip.selected { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
 
-        .urgency-row { display: flex; gap: 10px; }
-        .urgency-btn {
-            flex: 1; padding: 12px; border-radius: 10px; cursor: pointer;
-            border: 1px solid #2e2e2e; background: var(--bg2);
-            color: var(--muted); font-size: .85em; font-weight: 600;
-            text-align: center; transition: all .2s; user-select: none;
+        .chip:hover {
+            border-color: var(--gold-border);
+            color: var(--gold);
         }
-        .urgency-btn:hover { border-color: var(--gold-border); color: var(--gold); }
-        .urgency-btn.selected { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+
+        .chip.selected {
+            border-color: var(--gold);
+            background: var(--gold-dim);
+            color: var(--gold);
+        }
+
+        .urgency-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .urgency-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid #2e2e2e;
+            background: var(--bg2);
+            color: var(--muted);
+            font-size: .85em;
+            font-weight: 600;
+            text-align: center;
+            transition: all .2s;
+            user-select: none;
+        }
+
+        .urgency-btn:hover {
+            border-color: var(--gold-border);
+            color: var(--gold);
+        }
+
+        .urgency-btn.selected {
+            border-color: var(--gold);
+            background: var(--gold-dim);
+            color: var(--gold);
+        }
 
         .submit-btn {
-            width: 100%; padding: 16px;
-            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-            border: none; border-radius: 12px;
-            color: #0a0a0a; font-size: 1.05em; font-weight: 800;
-            cursor: pointer; transition: all .3s; margin-top: 8px;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: auto;
+            min-width: 220px;
+            margin: 0 auto;
+            padding: 16px 36px;
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid var(--gold-border);
+            border-radius: 50px;
+            color: var(--gold);
+            font-size: 0.95em;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            position: relative;
+            overflow: hidden;
         }
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,175,55,.4); }
-        .submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+            transition: all 0.5s ease;
+        }
+
+        .submit-btn:hover {
+            background: var(--gold);
+            color: #0a0a0a;
+            border-color: var(--gold);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+            background: transparent;
+            border-color: #333;
+            color: #555;
+            box-shadow: none;
+        }
+
+        .submit-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            width: 100%;
+        }
 
         /* ── SUCCESS / ERROR ── */
         .alert {
-            padding: 16px 20px; border-radius: 12px; font-size: .95em;
-            font-weight: 600; margin-top: 16px; display: none; align-items: center; gap: 12px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: .95em;
+            font-weight: 600;
+            margin-top: 16px;
+            display: none;
+            align-items: center;
+            gap: 12px;
         }
-        .alert.success { background: rgba(75,181,67,.12); border: 1px solid var(--green); color: var(--green); display: flex; }
-        .alert.error   { background: rgba(231,76,60,.12); border: 1px solid var(--red); color: var(--red); display: flex; }
+
+        .alert.success {
+            background: rgba(75, 181, 67, .12);
+            border: 1px solid var(--green);
+            color: var(--green);
+            display: flex;
+        }
+
+        .alert.error {
+            background: rgba(231, 76, 60, .12);
+            border: 1px solid var(--red);
+            color: var(--red);
+            display: flex;
+        }
 
         .ticket-result {
-            display: none; padding: 28px; background: var(--bg2);
-            border: 1px solid var(--gold-border); border-radius: 14px;
-            text-align: center; margin-top: 20px;
+            display: none;
+            padding: 28px;
+            background: var(--bg2);
+            border: 1px solid var(--gold-border);
+            border-radius: 14px;
+            text-align: center;
+            margin-top: 20px;
         }
+
         .ticket-result .ticket-num {
-            font-size: 2.5em; font-weight: 900; color: var(--gold); letter-spacing: .05em;
+            font-size: 2.5em;
+            font-weight: 900;
+            color: var(--gold);
+            letter-spacing: .05em;
         }
-        .ticket-result p { color: var(--muted); margin-top: 8px; font-size: .9em; line-height: 1.6; }
+
+        .ticket-result p {
+            color: var(--muted);
+            margin-top: 8px;
+            font-size: .9em;
+            line-height: 1.6;
+        }
+
         .ticket-result .copy-btn {
-            margin-top: 16px; padding: 10px 24px;
-            background: var(--gold-dim); border: 1px solid var(--gold-border);
-            border-radius: 8px; color: var(--gold); font-weight: 700;
-            cursor: pointer; transition: all .2s; font-size: .9em;
+            margin-top: 16px;
+            padding: 10px 24px;
+            background: var(--gold-dim);
+            border: 1px solid var(--gold-border);
+            border-radius: 8px;
+            color: var(--gold);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            font-size: .9em;
         }
-        .ticket-result .copy-btn:hover { background: rgba(212,175,55,.25); }
+
+        .ticket-result .copy-btn:hover {
+            background: rgba(212, 175, 55, .25);
+        }
 
         /* ── LOADER ── */
         .spinner {
-            width: 18px; height: 18px; border: 3px solid rgba(0,0,0,.2);
-            border-top-color: #0a0a0a; border-radius: 50%;
-            animation: spin .6s linear infinite; display: none;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(0, 0, 0, .2);
+            border-top-color: #0a0a0a;
+            border-radius: 50%;
+            animation: spin .6s linear infinite;
+            display: none;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── CATEGORY SELECTOR ── */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .cat-card {
+            background: var(--bg3);
+            border: 1px solid #2a2a2a;
+            border-radius: 20px;
+            padding: 40px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .cat-card:hover {
+            border-color: var(--gold-border);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .cat-card:hover::before {
+            opacity: 1;
+        }
+
+        .cat-icon {
+            font-size: 3em;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .cat-title {
+            font-size: 1.5em;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .cat-desc {
+            color: var(--muted);
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 1px solid var(--gold-border);
+            color: var(--gold);
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            margin-bottom: 24px;
+            font-size: 0.95em;
+        }
+
+        .back-btn:hover {
+            background: var(--gold-dim);
+            border-color: var(--gold);
+        }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 700px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .form-card { padding: 28px 20px; }
-            .hero { padding-top: 110px; }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-card {
+                padding: 28px 20px;
+            }
+
+            .hero {
+                padding-top: 110px;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar">
-    <div class="nav-container">
-        <a class="nav-logo" href="index.html">Dumar</a>
-        <ul class="nav-links">
-            <li><a href="index.html">Portfolio</a></li>
-            <li><a href="commissions.html" style="color:var(--gold)">Commissions</a></li>
-            <li><a href="ticket.html">Track Ticket</a></li>
-        </ul>
-    </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-    <div id="statusBanner" class="status-banner open">
-        <div class="status-dot"></div>
-        <span id="statusText">Loading status…</span>
-    </div>
-    <p class="slots-info" id="slotsInfo"></p>
-    <h1>Request a Commission</h1>
-    <p>Fill out the form below and I'll review your request as soon as possible. You'll receive a ticket number to track your status.</p>
-</section>
-
-<div class="main">
-
-    <!-- FAQ -->
-    <div class="section-label">Common questions</div>
-    <h2 class="section-title">FAQ</h2>
-    <div class="faq-grid" id="faqGrid"></div>
-
-    <!-- FORM -->
-    <div class="section-label">Submit your project</div>
-    <h2 class="section-title">Commission Request</h2>
-
-    <div class="form-card">
-        <div class="form-grid" id="commissionForm">
-
-            <div class="form-group">
-                <label>Your name <span class="req">*</span></label>
-                <input type="text" id="clientName" placeholder="e.g. Alex" maxlength="60">
+    <!-- NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo" onclick="scrollToTop()">Dumar</div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="web.html" class="nav-link">Web</a></li>
+                <li><a href="app.html" class="nav-link">App</a></li>
+                <li><a href="juegos.html" class="nav-link">Juegos</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+                <li><a href="commissions.html" class="nav-link">Commissions</a></li>
+            </ul>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
+        </div>
+    </nav>
 
-            <div class="form-group">
-                <label>Roblox username <span class="req">*</span></label>
-                <input type="text" id="robloxUser" placeholder="e.g. Dumar21" maxlength="40">
+    <!-- HERO -->
+    <section class="hero">
+        <div class="particles" id="particles"></div>
+        <div style="position: relative; z-index: 1;">
+            <div id="statusBanner" class="status-banner open">
+                <div class="status-dot"></div>
+                <span id="statusText">Loading status…</span>
             </div>
-
-            <div class="form-group">
-                <label>Type of work <span class="req">*</span></label>
-                <select id="workType">
-                    <option value="">– Select –</option>
-                    <option value="new_game">🎮 Build a new game from scratch</option>
-                    <option value="system">⚙️ Script / system for existing game</option>
-                    <option value="ui">🎨 UI / Interface design</option>
-                    <option value="bug_fix">🐛 Bug fixing</option>
-                    <option value="collab">🤝 Collab / Revenue share</option>
-                    <option value="other">💬 Other</option>
-                </select>
+            <p class="slots-info" id="slotsInfo"></p>
+            <h1>Request a Commission</h1>
+            <p>Fill out the form below and I'll review your request as soon as possible. You'll receive a ticket number
+                to track your status.</p>
+            <div style="margin-top: 20px;">
+                <a href="ticket.html"
+                    style="display: inline-block; padding: 10px 20px; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); color: #d4af37; text-decoration: none; border-radius: 8px; transition: all 0.3s; font-weight: bold;">Track
+                    existing ticket</a>
             </div>
+        </div>
+    </section>
 
-            <div class="form-group">
-                <label>Payment method <span class="req">*</span></label>
-                <div class="payment-chips" id="paymentChips">
-                    <div class="chip" data-value="usd">💵 USD</div>
-                    <div class="chip" data-value="robux">🎮 Robux</div>
-                    <div class="chip" data-value="percent">📊 % Revenue</div>
-                    <div class="chip" data-value="discuss">🤝 Discuss</div>
-                </div>
+    <div class="main">
+
+        <!-- FAQ -->
+        <div class="section-label">Common questions</div>
+        <h2 class="section-title">FAQ</h2>
+        <div class="faq-grid" id="faqGrid"></div>
+
+        <!-- FORM -->
+        <div class="section-label">Submit your project</div>
+        <h2 class="section-title" id="formSectionTitle">Select a Category</h2>
+
+        <div id="categorySelection" class="category-grid">
+            <div class="cat-card" onclick="selectCategory('web')">
+                <i class="fas fa-globe cat-icon"></i>
+                <h3 class="cat-title">Web Development</h3>
+                <p class="cat-desc">Landing pages, websites, and custom web applications.</p>
             </div>
-
-            <div class="form-group full">
-                <label>Project description <span class="req">*</span></label>
-                <textarea id="description" placeholder="Describe exactly what you need: systems, mechanics, how many scripts, references, etc. The more detail, the faster I can evaluate."></textarea>
+            <div class="cat-card" onclick="selectCategory('app')">
+                <i class="fas fa-mobile-alt cat-icon"></i>
+                <h3 class="cat-title">App Development</h3>
+                <p class="cat-desc">Mobile and desktop applications tailored to your needs.</p>
             </div>
-
-            <div class="form-group">
-                <label>Your budget <span class="req">*</span></label>
-                <div class="budget-wrap">
-                    <span class="budget-prefix" id="budgetPrefix">$</span>
-                    <input type="text" id="budget" placeholder="e.g. 15 USD / 1500 Robux / 10%">
-                </div>
-                <small style="color:var(--muted);font-size:.8em;margin-top:4px">Enter what you're willing to pay — be honest 😄</small>
+            <div class="cat-card" onclick="selectCategory('juegos')">
+                <i class="fas fa-gamepad cat-icon"></i>
+                <h3 class="cat-title">Juegos (Roblox)</h3>
+                <p class="cat-desc">New games, advanced scripting, and custom systems.</p>
             </div>
-
-            <div class="form-group">
-                <label>Urgency</label>
-                <div class="urgency-row" id="urgencyRow">
-                    <div class="urgency-btn" data-value="no_rush">😌 No rush</div>
-                    <div class="urgency-btn" data-value="normal">⏱ Normal</div>
-                    <div class="urgency-btn selected" data-value="urgent">🔥 Urgent</div>
-                </div>
-            </div>
-
-            <div class="form-group full">
-                <label>Discord / contact (optional)</label>
-                <input type="text" id="contactInfo" placeholder="Discord tag, Roblox DM, etc.">
-            </div>
-
         </div>
 
-        <div style="margin-top:28px">
-            <button class="submit-btn" id="submitBtn" onclick="submitCommission()">
-                <div class="spinner" id="spinner"></div>
-                <i class="fas fa-paper-plane" id="submitIcon"></i>
-                <span id="submitTxt">Send Commission Request</span>
-            </button>
+        <div id="formContainer" style="display: none;">
+            <button class="back-btn" onclick="showCategories()"><i class="fas fa-arrow-left"></i> Change
+                Category</button>
+            <div class="form-card">
+                <div class="form-grid" id="commissionForm">
+
+                    <div class="form-group">
+                        <label>Your name <span class="req">*</span></label>
+                        <input type="text" id="clientName" placeholder="e.g. Alex" maxlength="60">
+                    </div>
+
+                    <div class="form-group" id="robloxUserGroup">
+                        <label>Roblox username <span class="req">*</span></label>
+                        <input type="text" id="robloxUser" placeholder="e.g. Dumar21" maxlength="40">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Type of work <span class="req">*</span></label>
+                        <select id="workType">
+                            <!-- Populated dynamically based on category -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Payment method <span class="req">*</span></label>
+                        <div class="payment-chips" id="paymentChips">
+                            <div class="chip" data-value="usd">💵 USD</div>
+                            <div class="chip" data-value="robux" id="robuxChip">🎮 Robux</div>
+                            <div class="chip" data-value="percent">📊 % Revenue</div>
+                            <div class="chip" data-value="discuss">🤝 Discuss</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Project description <span class="req">*</span></label>
+                        <textarea id="description"
+                            placeholder="Describe exactly what you need: systems, mechanics, how many scripts, references, etc. The more detail, the faster I can evaluate."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Your budget <span class="req">*</span></label>
+                        <div class="budget-wrap">
+                            <span class="budget-prefix" id="budgetPrefix">$</span>
+                            <input type="text" id="budget" placeholder="e.g. 15 USD / 1500 Robux / 10%">
+                        </div>
+                        <small style="color:var(--muted);font-size:.8em;margin-top:4px">Enter what you're willing to pay
+                            —
+                            be honest 😄</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Urgency</label>
+                        <div class="urgency-row" id="urgencyRow">
+                            <div class="urgency-btn" data-value="no_rush">😌 No rush</div>
+                            <div class="urgency-btn" data-value="normal">⏱ Normal</div>
+                            <div class="urgency-btn selected" data-value="urgent">🔥 Urgent</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Discord / contact (optional)</label>
+                        <input type="text" id="contactInfo" placeholder="Discord tag, Roblox DM, etc.">
+                    </div>
+
+                </div>
+
+                <div class="submit-wrap">
+                    <button class="submit-btn" id="submitBtn" onclick="submitCommission()">
+                        <div class="spinner" id="spinner"></div>
+                        <span id="submitTxt">Submit Request</span>
+                    </button>
+                </div>
+
+                <div class="alert" id="alertBox"></div>
+
+                <!-- SUCCESS TICKET -->
+                <div class="ticket-result" id="ticketResult">
+                    <div style="font-size:2em;margin-bottom:8px">🎟️</div>
+                    <div style="color:var(--muted);font-size:.85em;margin-bottom:4px">Your ticket number</div>
+                    <div class="ticket-num" id="ticketNum">-</div>
+                    <p>Save this number! Use it on <a href="ticket.html" style="color:var(--gold)">Track Ticket</a> to
+                        check
+                        your request status.<br>I'll review it as soon as possible.</p>
+                    <button class="copy-btn" onclick="copyTicket()"><i class="fas fa-copy"></i> Copy number</button>
+                </div>
+            </div>
         </div>
 
-        <div class="alert" id="alertBox"></div>
-
-        <!-- SUCCESS TICKET -->
-        <div class="ticket-result" id="ticketResult">
-            <div style="font-size:2em;margin-bottom:8px">🎟️</div>
-            <div style="color:var(--muted);font-size:.85em;margin-bottom:4px">Your ticket number</div>
-            <div class="ticket-num" id="ticketNum">-</div>
-            <p>Save this number! Use it on <a href="ticket.html" style="color:var(--gold)">Track Ticket</a> to check your request status.<br>I'll review it as soon as possible.</p>
-            <button class="copy-btn" onclick="copyTicket()"><i class="fas fa-copy"></i> Copy number</button>
-        </div>
     </div>
 
-</div>
+    <script>
+        // ══════════════════════════════════════════
+        //  ⚠️  REPLACE THESE WITH YOUR SUPABASE KEYS
+        // ══════════════════════════════════════════
+        const SUPABASE_URL = 'https://gaxohanwkayubyzypmwu.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdheG9oYW53a2F5dWJ5enlwbXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTk4NDIsImV4cCI6MjA5MjUzNTg0Mn0.940Rv8zOaC_Q8evvsD-3U0rXpoLF__vb83NrOkKOl78';
+        // ══════════════════════════════════════════
 
-<script>
-// ══════════════════════════════════════════
-//  ⚠️  REPLACE THESE WITH YOUR SUPABASE KEYS
-// ══════════════════════════════════════════
-const SUPABASE_URL = 'https://gaxohanwkayubyzypmwu.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdheG9oYW53a2F5dWJ5enlwbXd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTk4NDIsImV4cCI6MjA5MjUzNTg0Mn0.940Rv8zOaC_Q8evvsD-3U0rXpoLF__vb83NrOkKOl78';
-// ══════════════════════════════════════════
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // ── State ──
+        let selectedPayment = '';
+        let selectedUrgency = 'urgent';
 
-// ── State ──
-let selectedPayment = '';
-let selectedUrgency = 'urgent';
+        // ── FAQ Data ──
+        const faqs = [
+            {
+                q: "How long does it take to start working on my project?",
+                a: "Once I accept your request, I'll contact you within 24–48 hours to confirm details. Start time depends on my current workload — you'll see my availability status above."
+            },
+            {
+                q: "What if I don't know how much to pay?",
+                a: "Just put what you're comfortable with. I'll tell you if it works or suggest an adjustment — no pressure. Small budgets may limit scope, not quality."
+            },
+            {
+                q: "Can I request something if you're listed as Busy?",
+                a: "Yes! Submit anyway and you'll go on the waitlist. I'll contact you when a slot opens. Your ticket keeps your spot in line."
+            },
+            {
+                q: "Do you do revenue share (% deals)?",
+                a: "Yes, for solid projects with clear scope. I evaluate case by case. Include as many details as possible about your game and expected player base."
+            },
+            {
+                q: "What if I need changes after delivery?",
+                a: "Minor adjustments related to the original scope are included. New features or significant changes are a separate commission."
+            },
+            {
+                q: "Can you fix bugs in code that wasn't written by you?",
+                a: "Absolutely — I actually specialize in this. Describe the issue and share what access you can, and I'll take a look."
+            },
+            {
+                q: "How do I know you received my request?",
+                a: "You'll get a ticket number instantly after submitting. You can check its status any time at the Track Ticket page."
+            }
+        ];
 
-// ── FAQ Data ──
-const faqs = [
-    {
-        q: "How long does it take to start working on my project?",
-        a: "Once I accept your request, I'll contact you within 24–48 hours to confirm details. Start time depends on my current workload — you'll see my availability status above."
-    },
-    {
-        q: "What if I don't know how much to pay?",
-        a: "Just put what you're comfortable with. I'll tell you if it works or suggest an adjustment — no pressure. Small budgets may limit scope, not quality."
-    },
-    {
-        q: "Can I request something if you're listed as Busy?",
-        a: "Yes! Submit anyway and you'll go on the waitlist. I'll contact you when a slot opens. Your ticket keeps your spot in line."
-    },
-    {
-        q: "Do you do revenue share (% deals)?",
-        a: "Yes, for solid projects with clear scope. I evaluate case by case. Include as many details as possible about your game and expected player base."
-    },
-    {
-        q: "What if I need changes after delivery?",
-        a: "Minor adjustments related to the original scope are included. New features or significant changes are a separate commission."
-    },
-    {
-        q: "Can you fix bugs in code that wasn't written by you?",
-        a: "Absolutely — I actually specialize in this. Describe the issue and share what access you can, and I'll take a look."
-    },
-    {
-        q: "How do I know you received my request?",
-        a: "You'll get a ticket number instantly after submitting. You can check its status any time at the Track Ticket page."
-    }
-];
-
-// ── Render FAQ ──
-const faqGrid = document.getElementById('faqGrid');
-faqs.forEach(f => {
-    const item = document.createElement('div');
-    item.className = 'faq-item';
-    item.innerHTML = `
+        // ── Render FAQ ──
+        const faqGrid = document.getElementById('faqGrid');
+        faqs.forEach(f => {
+            const item = document.createElement('div');
+            item.className = 'faq-item';
+            item.innerHTML = `
         <div class="faq-q" onclick="toggleFaq(this)">
             <span>${f.q}</span>
             <i class="fas fa-plus faq-icon"></i>
         </div>
         <div class="faq-a">${f.a}</div>`;
-    faqGrid.appendChild(item);
-});
+            faqGrid.appendChild(item);
+        });
 
-function toggleFaq(el) {
-    el.parentElement.classList.toggle('open');
-}
+        function toggleFaq(el) {
+            el.parentElement.classList.toggle('open');
+        }
 
-// ── Payment chips ──
-document.querySelectorAll('#paymentChips .chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-        document.querySelectorAll('#paymentChips .chip').forEach(c => c.classList.remove('selected'));
-        chip.classList.add('selected');
-        selectedPayment = chip.dataset.value;
-        const prefix = document.getElementById('budgetPrefix');
-        if (selectedPayment === 'usd') prefix.textContent = '$';
-        else if (selectedPayment === 'robux') prefix.textContent = '🎮';
-        else if (selectedPayment === 'percent') prefix.textContent = '%';
-        else prefix.textContent = '~';
-    });
-});
+        // ── Payment chips ──
+        document.querySelectorAll('#paymentChips .chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('#paymentChips .chip').forEach(c => c.classList.remove('selected'));
+                chip.classList.add('selected');
+                selectedPayment = chip.dataset.value;
+                const prefix = document.getElementById('budgetPrefix');
+                if (selectedPayment === 'usd') prefix.textContent = '$';
+                else if (selectedPayment === 'robux') prefix.textContent = '🎮';
+                else if (selectedPayment === 'percent') prefix.textContent = '%';
+                else prefix.textContent = '~';
+            });
+        });
 
-// ── Urgency ──
-document.querySelectorAll('#urgencyRow .urgency-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('#urgencyRow .urgency-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedUrgency = btn.dataset.value;
-    });
-});
+        // ── Urgency ──
+        document.querySelectorAll('#urgencyRow .urgency-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#urgencyRow .urgency-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedUrgency = btn.dataset.value;
+            });
+        });
 
-// ── Load status from Supabase ──
-async function loadStatus() {
-    try {
-        const { data, error } = await sb.from('commission_config').select('*').single();
-        if (error || !data) return;
-        const banner = document.getElementById('statusBanner');
-        const txt = document.getElementById('statusText');
-        const slots = document.getElementById('slotsInfo');
-        const statusMap = {
-            open:   { cls: 'open',   label: 'Open for commissions' },
-            busy:   { cls: 'busy',   label: 'Busy — Waitlist open' },
-            closed: { cls: 'closed', label: 'Closed — Not accepting requests' }
+        // ── Load status from Supabase ──
+        async function loadStatus() {
+            try {
+                const { data, error } = await sb.from('commission_config').select('*').single();
+                if (error || !data) return;
+                const banner = document.getElementById('statusBanner');
+                const txt = document.getElementById('statusText');
+                const slots = document.getElementById('slotsInfo');
+                const statusMap = {
+                    open: { cls: 'open', label: 'Open for commissions' },
+                    busy: { cls: 'busy', label: 'Busy — Waitlist open' },
+                    closed: { cls: 'closed', label: 'Closed — Not accepting requests' }
+                };
+                const s = statusMap[data.status] || statusMap.open;
+                banner.className = 'status-banner ' + s.cls;
+                txt.textContent = s.label;
+                if (data.slots_available != null) {
+                    slots.textContent = data.slots_available > 0
+                        ? `${data.slots_available} slot(s) currently available`
+                        : 'No slots available right now';
+                }
+                if (data.status === 'closed') {
+                    document.getElementById('submitBtn').disabled = true;
+                    document.getElementById('submitTxt').textContent = 'Not accepting requests right now';
+                }
+            } catch (e) { /* silently fail */ }
+        }
+
+        // ── Generate ticket ID ──
+        function genTicket() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let r = 'DM-';
+            for (let i = 0; i < 6; i++) r += chars[Math.floor(Math.random() * chars.length)];
+            return r;
+        }
+
+        // ── Category selection logic ──
+        let currentCategory = '';
+
+        const workOptions = {
+            web: [
+                { value: 'new_website', label: '🌐 New Website / Landing Page' },
+                { value: 'web_app', label: '💻 Web Application' },
+                { value: 'bug_fix_web', label: '🐛 Bug fixing' },
+                { value: 'ui', label: '🎨 UI / Interface design' },
+                { value: 'collab', label: '🤝 Collab / Revenue share' },
+                { value: 'other', label: '💬 Other' }
+            ],
+            app: [
+                { value: 'mobile_app', label: '📱 Mobile Application' },
+                { value: 'desktop_app', label: '🖥️ Desktop Application' },
+                { value: 'ui', label: '🎨 UI / Interface design' },
+                { value: 'collab', label: '🤝 Collab / Revenue share' },
+                { value: 'other', label: '💬 Other' }
+            ],
+            juegos: [
+                { value: 'new_game', label: '🎮 Build a new game from scratch' },
+                { value: 'system', label: '⚙️ Script / system for existing game' },
+                { value: 'bug_fix_game', label: '🐛 Bug fixing (Roblox)' },
+                { value: 'ui', label: '🎨 UI / Interface design' },
+                { value: 'collab', label: '🤝 Collab / Revenue share' },
+                { value: 'other', label: '💬 Other' }
+            ]
         };
-        const s = statusMap[data.status] || statusMap.open;
-        banner.className = 'status-banner ' + s.cls;
-        txt.textContent = s.label;
-        if (data.slots_available != null) {
-            slots.textContent = data.slots_available > 0
-                ? `${data.slots_available} slot(s) currently available`
-                : 'No slots available right now';
+
+        function selectCategory(cat) {
+            currentCategory = cat;
+            document.getElementById('categorySelection').style.display = 'none';
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('formSectionTitle').textContent = 'Commission Request';
+
+            const workTypeSelect = document.getElementById('workType');
+            workTypeSelect.innerHTML = '<option value="">– Select –</option>';
+            workOptions[cat].forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.label;
+                workTypeSelect.appendChild(option);
+            });
+
+            const robloxUserGroup = document.getElementById('robloxUserGroup');
+            const robuxChip = document.getElementById('robuxChip');
+            const budgetInput = document.getElementById('budget');
+            const contactInput = document.getElementById('contactInfo');
+
+            if (cat === 'juegos') {
+                robloxUserGroup.style.display = 'flex';
+                robuxChip.style.display = 'block';
+                budgetInput.placeholder = 'e.g. 15 USD / 1500 Robux / 10%';
+                contactInput.placeholder = 'Discord tag, Roblox DM, etc.';
+            } else {
+                robloxUserGroup.style.display = 'none';
+                robuxChip.style.display = 'none';
+                budgetInput.placeholder = 'e.g. 100 USD / 10%';
+                contactInput.placeholder = 'Email, Discord tag, etc.';
+
+                if (selectedPayment === 'robux') {
+                    robuxChip.classList.remove('selected');
+                    const usdChip = document.querySelector('.chip[data-value="usd"]');
+                    if (usdChip) {
+                        usdChip.classList.add('selected');
+                        selectedPayment = 'usd';
+                        document.getElementById('budgetPrefix').textContent = '$';
+                    }
+                }
+            }
         }
-        if (data.status === 'closed') {
-            document.getElementById('submitBtn').disabled = true;
-            document.getElementById('submitTxt').textContent = 'Not accepting requests right now';
+
+        function showCategories() {
+            document.getElementById('categorySelection').style.display = 'grid';
+            document.getElementById('formContainer').style.display = 'none';
+            document.getElementById('formSectionTitle').textContent = 'Select a Category';
         }
-    } catch(e) { /* silently fail */ }
-}
 
-// ── Generate ticket ID ──
-function genTicket() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let r = 'DM-';
-    for (let i = 0; i < 6; i++) r += chars[Math.floor(Math.random() * chars.length)];
-    return r;
-}
+        // ── Submit ──
+        async function submitCommission() {
+            const name = document.getElementById('clientName').value.trim();
+            const workTypeEl = document.getElementById('workType');
+            const workType = workTypeEl.value;
+            const isRoblox = currentCategory === 'juegos';
+            const roblox = isRoblox ? document.getElementById('robloxUser').value.trim() : 'N/A';
+            const description = document.getElementById('description').value.trim();
+            const budget = document.getElementById('budget').value.trim();
+            const contact = document.getElementById('contactInfo').value.trim();
 
-// ── Submit ──
-async function submitCommission() {
-    const name        = document.getElementById('clientName').value.trim();
-    const roblox      = document.getElementById('robloxUser').value.trim();
-    const workType    = document.getElementById('workType').value;
-    const description = document.getElementById('description').value.trim();
-    const budget      = document.getElementById('budget').value.trim();
-    const contact     = document.getElementById('contactInfo').value.trim();
+            // Validate
+            if (!name || (isRoblox && !roblox) || !workType || !description || !budget || !selectedPayment) {
+                showAlert('error', 'Please fill in all required fields and select a payment method.');
+                return;
+            }
 
-    // Validate
-    if (!name || !roblox || !workType || !description || !budget || !selectedPayment) {
-        showAlert('error', 'Please fill in all required fields and select a payment method.');
-        return;
-    }
+            const btn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('spinner');
+            const icon = document.getElementById('submitIcon');
+            const txt = document.getElementById('submitTxt');
 
-    const btn     = document.getElementById('submitBtn');
-    const spinner = document.getElementById('spinner');
-    const icon    = document.getElementById('submitIcon');
-    const txt     = document.getElementById('submitTxt');
+            btn.disabled = true;
+            spinner.style.display = 'block';
+            if (icon) icon.style.display = 'none';
+            txt.textContent = 'Sending…';
 
-    btn.disabled = true;
-    spinner.style.display = 'block';
-    icon.style.display    = 'none';
-    txt.textContent       = 'Sending…';
+            const ticketId = genTicket();
 
-    const ticketId = genTicket();
+            try {
+                const { error } = await sb.from('commissions').insert([{
+                    ticket_id: ticketId,
+                    client_name: name,
+                    roblox_user: roblox,
+                    work_type: workType,
+                    description: description,
+                    budget: budget,
+                    payment_method: selectedPayment,
+                    urgency: selectedUrgency,
+                    contact_info: contact,
+                    status: 'pending',
+                    created_at: new Date().toISOString()
+                }]);
 
-    try {
-        const { error } = await sb.from('commissions').insert([{
-            ticket_id:      ticketId,
-            client_name:    name,
-            roblox_user:    roblox,
-            work_type:      workType,
-            description:    description,
-            budget:         budget,
-            payment_method: selectedPayment,
-            urgency:        selectedUrgency,
-            contact_info:   contact,
-            status:         'pending',
-            created_at:     new Date().toISOString()
-        }]);
+                if (error) throw error;
 
-        if (error) throw error;
+                // Success
+                document.getElementById('commissionForm').style.opacity = '.3';
+                document.getElementById('commissionForm').style.pointerEvents = 'none';
+                btn.style.display = 'none';
+                document.getElementById('ticketNum').textContent = ticketId;
+                document.getElementById('ticketResult').style.display = 'block';
 
-        // Success
-        document.getElementById('commissionForm').style.opacity = '.3';
-        document.getElementById('commissionForm').style.pointerEvents = 'none';
-        btn.style.display = 'none';
-        document.getElementById('ticketNum').textContent = ticketId;
-        document.getElementById('ticketResult').style.display = 'block';
+            } catch (e) {
+                showAlert('error', 'Something went wrong. Please try again or contact me directly on Discord.');
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                if (icon) icon.style.display = '';
+                txt.textContent = 'Submit Request';
+            }
+        }
 
-    } catch(e) {
-        showAlert('error', 'Something went wrong. Please try again or contact me directly on Discord.');
-        btn.disabled = false;
-        spinner.style.display = 'none';
-        icon.style.display    = '';
-        txt.textContent       = 'Send Commission Request';
-    }
-}
+        function showAlert(type, msg) {
+            const box = document.getElementById('alertBox');
+            box.className = 'alert ' + type;
+            box.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+        }
 
-function showAlert(type, msg) {
-    const box = document.getElementById('alertBox');
-    box.className = 'alert ' + type;
-    box.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
-}
+        function copyTicket() {
+            const num = document.getElementById('ticketNum').textContent;
+            navigator.clipboard.writeText(num).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✓ Copied!';
+                setTimeout(() => btn.innerHTML = '<i class="fas fa-copy"></i> Copy number', 2000);
+            });
+        }
 
-function copyTicket() {
-    const num = document.getElementById('ticketNum').textContent;
-    navigator.clipboard.writeText(num).then(() => {
-        const btn = document.querySelector('.copy-btn');
-        btn.textContent = '✓ Copied!';
-        setTimeout(() => btn.innerHTML = '<i class="fas fa-copy"></i> Copy number', 2000);
-    });
-}
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-loadStatus();
-</script>
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        document.getElementById('navToggle').addEventListener('click', () => {
+            document.getElementById('navMenu').classList.toggle('active');
+            document.getElementById('navToggle').classList.toggle('active');
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navMenu').classList.remove('active');
+                document.getElementById('navToggle').classList.remove('active');
+            });
+        });
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        loadStatus();
+    </script>
 </body>
+
 </html>
