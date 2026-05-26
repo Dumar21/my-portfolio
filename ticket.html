@@ -18,23 +18,189 @@
             --green:#4bb543; --red:#e74c3c; --yellow:#f39c12; --blue:#3498db;
         }
 
-        body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
 
         .navbar {
-            position:fixed; top:0; left:0; right:0;
-            background:rgba(20,20,20,.96); backdrop-filter:blur(12px);
-            padding:18px 0; z-index:1000; border-bottom:1px solid var(--gold-border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            transform: translateY(-100%);
+            animation: slideDown 0.5s ease forwards 0.3s;
         }
-        .nav-container { max-width:1100px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; align-items:center; }
-        .nav-logo { font-size:1.4em; font-weight:800; background:linear-gradient(135deg,#fff 0%,var(--gold) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-decoration:none; }
-        .nav-links { display:flex; gap:32px; list-style:none; }
-        .nav-links a { color:var(--text); text-decoration:none; font-weight:500; transition:color .2s; font-size:.95em; }
-        .nav-links a:hover { color:var(--gold); }
+
+        @keyframes slideDown {
+            to { transform: translateY(0); }
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.98);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffffff 0%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        @media (max-width: 968px) {
+            .nav-menu {
+                position: fixed;
+                top: -100%;
+                left: 0;
+                flex-direction: column;
+                background: rgba(10, 10, 10, 0.98);
+                width: 100%;
+                padding: 20px;
+                gap: 20px;
+                transition: top 0.3s ease;
+                border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+                backdrop-filter: blur(10px);
+                z-index: 999;
+            }
+
+            .nav-menu.active {
+                top: 70px;
+            }
+
+            .nav-toggle {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                cursor: pointer;
+                padding: 5px;
+                transition: all 0.3s ease;
+                z-index: 1000;
+            }
+
+            .nav-toggle span {
+                width: 25px;
+                height: 3px;
+                background: #d4af37;
+                transition: all 0.3s ease;
+                transform-origin: center;
+            }
+
+            .nav-toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(6px, 6px);
+            }
+
+            .nav-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .nav-toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(6px, -6px);
+            }
+        }
+
+        .nav-link {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+            font-size: 16px;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #d4af37, #f4d03f);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #d4af37;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .nav-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #d4af37;
+            transition: all 0.3s ease;
+        }
+        
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #d4af37;
+            border-radius: 50%;
+            animation: float 15s infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-100px) translateX(50px); }
+        }
 
         /* ── HERO ── */
-        .hero { padding:130px 24px 60px; text-align:center; background:radial-gradient(ellipse 70% 40% at 50% 0%,rgba(212,175,55,.07) 0%,transparent 70%); }
-        .hero h1 { font-size:clamp(2em,5vw,3.2em); font-weight:800; background:linear-gradient(135deg,#fff 30%,var(--gold) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:12px; }
-        .hero p { color:var(--muted); max-width:500px; margin:0 auto 40px; line-height:1.7; }
+        .hero { padding:130px 24px 60px; text-align:center; background:radial-gradient(ellipse 70% 40% at 50% 0%,rgba(212,175,55,.07) 0%,transparent 70%); position: relative; overflow: hidden; }
+        .hero h1 { font-size:clamp(2em,5vw,3.2em); font-weight:800; background:linear-gradient(135deg,#fff 30%,var(--gold) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:12px; position: relative; z-index: 1; }
+        .hero p { color:var(--muted); max-width:500px; margin:0 auto 40px; line-height:1.7; position: relative; z-index: 1; }
 
         /* ── SEARCH ── */
         .search-wrap { max-width:500px; margin:0 auto; display:flex; gap:12px; }
@@ -151,21 +317,30 @@
 </head>
 <body>
 
-<nav class="navbar">
+<nav class="navbar" id="navbar">
     <div class="nav-container">
-        <a class="nav-logo" href="index.html">Dumar</a>
-        <ul class="nav-links">
-            <li><a href="index.html">Portfolio</a></li>
-            <li><a href="commissions.html">Commissions</a></li>
-            <li><a href="ticket.html" style="color:var(--gold)">Track Ticket</a></li>
+        <div class="nav-logo" onclick="scrollToTop()">Dumar</div>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="web.html" class="nav-link">Web</a></li>
+            <li><a href="app.html" class="nav-link">App</a></li>
+            <li><a href="juegos.html" class="nav-link">Juegos</a></li>
+            <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            <li><a href="commissions.html" class="nav-link">Commissions</a></li>
         </ul>
+        <div class="nav-toggle" id="navToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </div>
 </nav>
 
 <section class="hero">
+    <div class="particles" id="particles"></div>
     <h1>Track your ticket</h1>
     <p>Enter your ticket number to see the current status of your commission request.</p>
-    <div class="search-wrap">
+    <div class="search-wrap" style="position: relative; z-index: 1;">
         <input type="text" id="ticketInput" placeholder="e.g. DM-A3B7KC" maxlength="12" onkeydown="if(event.key==='Enter')searchTicket()">
         <button class="search-btn" onclick="searchTicket()"><i class="fas fa-search"></i></button>
     </div>
@@ -234,8 +409,11 @@ const STEPS = [
 ];
 
 const WORK_LABELS = {
-    new_game:'New game', system:'Script / System', ui:'UI Design',
-    bug_fix:'Bug fixing', collab:'Collab / Rev. share', other:'Other'
+    new_game:'New Game (Roblox)', system:'Script / System', ui:'UI Design',
+    bug_fix_game:'Bug fixing (Roblox)', 
+    new_website:'New Website', web_app:'Web Application', bug_fix_web:'Bug fixing (Web)',
+    mobile_app:'Mobile App', desktop_app:'Desktop App',
+    collab:'Collab / Rev. share', other:'Other'
 };
 const PAYMENT_LABELS = { usd:'💵 USD', robux:'🎮 Robux', percent:'📊 % Revenue', discuss:'🤝 Discuss' };
 const URGENCY_LABELS = { no_rush:'😌 No rush', normal:'⏱ Normal', urgent:'🔥 Urgent' };
@@ -347,6 +525,45 @@ if (params.get('ticket')) {
     document.getElementById('ticketInput').value = params.get('ticket');
     searchTicket();
 }
+
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+window.addEventListener('scroll', () => {
+    const navbar = document.getElementById('navbar');
+    if (window.scrollY > 100) {
+        navbar.classList.add('scrolled');
+    } else {
+        navbar.classList.remove('scrolled');
+    }
+});
+
+document.getElementById('navToggle').addEventListener('click', () => {
+    document.getElementById('navMenu').classList.toggle('active');
+    document.getElementById('navToggle').classList.toggle('active');
+});
+
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        document.getElementById('navMenu').classList.remove('active');
+        document.getElementById('navToggle').classList.remove('active');
+    });
+});
+
+function createParticles() {
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        container.appendChild(particle);
+    }
+}
+createParticles();
 </script>
 </body>
 </html>
