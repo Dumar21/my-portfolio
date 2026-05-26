@@ -433,9 +433,28 @@ function selectStatus(s) { currentStatus = s; updateSwBtns(s); }
 async function saveStatus() {
     const slots = parseInt(document.getElementById('slotsInput').value) || 0;
     try {
-        await sb.from('commission_config').upsert({ id:1, status:currentStatus, slots_available:slots });
+        const { data, error } = await sb.from('commission_config')
+            .update({ status: currentStatus, slots_available: slots })
+            .eq('id', 1)
+            .select();
+
+        if (error) {
+            console.error('Error al guardar estado:', error);
+            showToast('Error al guardar estado: ' + error.message, true);
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            console.error('Supabase RLS Blocked Update on commission_config');
+            showToast('Error: Permiso denegado (Revisa políticas RLS de UPDATE en commission_config)', true);
+            return;
+        }
+
         showToast('¡Estado actualizado!');
-    } catch(e) { showToast('Error al guardar', true); }
+    } catch(e) { 
+        console.error(e);
+        showToast('Error inesperado al guardar', true); 
+    }
 }
 
 // ── CARGA DE TICKETS ──
@@ -798,24 +817,31 @@ async function executeDelete() {
     if (refreshTimer) { clearTimeout(refreshTimer); refreshTimer = null; }
 
     try {
-        const { error } = await sb.from('commissions').delete().eq('id', id);
+        // Añadimos .select() para que Supabase nos devuelva el registro si realmente se borró.
+        // Si RLS está bloqueando el DELETE, data vendrá vacío.
+        const { data, error } = await sb.from('commissions').delete().eq('id', id).select();
 
         if (error) {
             console.error('Delete error:', error);
             showToast('Error al eliminar: ' + (error.message || ''), true);
-            // Reanudar ciclo normal si falló
             refreshTimer = setTimeout(loadTickets, 30000);
             return;
         }
 
-        // Eliminar de memoria local inmediatamente
+        if (!data || data.length === 0) {
+            console.error('Supabase RLS Blocked Delete: No rows were deleted.');
+            showToast('Error: Permiso denegado en BD (Verifica políticas RLS de DELETE en Supabase)', true);
+            refreshTimer = setTimeout(loadTickets, 30000);
+            return;
+        }
+
+        // Eliminar de memoria local inmediatamente solo si la BD lo confirmó
         allTickets = allTickets.filter(t => t.id !== id);
         renderAll();
         closeModalDirect();
         showToast('Ticket eliminado correctamente');
 
-        // ✅ CORRECCIÓN: reanudar el ciclo normal de 30s.
-        // NO recargar en 5s — eso era lo que hacía volver los tickets.
+        // Reanudar el ciclo normal
         refreshTimer = setTimeout(loadTickets, 30000);
 
     } catch(e) {
